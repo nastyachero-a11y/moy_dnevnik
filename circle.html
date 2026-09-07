@@ -490,6 +490,7 @@
       <h2>Кто ты в этом круге?</h2>
       <div class="char-grid" id="selfGrid"></div>
       <div class="modal-actions">
+        <button class="btn btn-secondary" id="selfCancelBtn" style="display:none;">Отмена</button>
         <button class="btn btn-primary" id="selfSelectBtn" disabled>Выбрать</button>
       </div>
     </div>
@@ -606,13 +607,20 @@
       return ids;
     }
 
-    function buildSelfGrid() {
+    function buildSelfGrid(isEdit = false) {
       selfGrid.innerHTML = '';
+      const used = usedIds();
+      // When editing, allow current centerId, exclude members' avatars
       CHAR_IDS.forEach(id => {
+        if (isEdit && used.has(id) && id !== state.centerId) return;
         const div = document.createElement('div');
         div.className = 'char-thumb';
         div.dataset.id = id;
-        div.innerHTML = `<img src="${gifPath(id, 'blink')}" alt=""><span class="me-label">Это я</span>`;
+        const isMe = id === state.centerId;
+        // In initial select show "Это я" on all (as prompt), in edit only on current
+        const label = (!isEdit || isMe) ? '<span class="me-label">Это я</span>' : '';
+        div.innerHTML = `<img src="${gifPath(id, 'blink')}" alt="">${label}`;
+        if (isMe) div.classList.add('selected');
         div.addEventListener('click', () => {
           selfGrid.querySelectorAll('.char-thumb').forEach(t => t.classList.remove('selected'));
           div.classList.add('selected');
@@ -621,6 +629,13 @@
         });
         selfGrid.appendChild(div);
       });
+      if (isEdit && state.centerId) {
+        selectedSelf = state.centerId;
+        selfSelectBtn.disabled = false;
+      } else {
+        selectedSelf = null;
+        selfSelectBtn.disabled = true;
+      }
     }
 
     function buildAddGrid() {
@@ -661,7 +676,23 @@
       showCenter();
       renderMembers();
       addBtn.style.display = 'flex';
+      document.getElementById('selfCancelBtn').style.display = 'none';
     });
+
+    document.getElementById('selfCancelBtn').addEventListener('click', () => {
+      selfModal.classList.remove('open');
+      document.getElementById('selfCancelBtn').style.display = 'none';
+    });
+
+    // Allow editing self character by clicking on center
+    centerChar.addEventListener('click', () => {
+      if (!state.centerId) return;
+      buildSelfGrid(true);
+      document.getElementById('selfCancelBtn').style.display = 'inline-flex';
+      selfModal.classList.add('open');
+    });
+    centerChar.style.cursor = 'pointer';
+    centerChar.title = 'Нажми, чтобы изменить персонажа';
 
     addBtn.addEventListener('click', () => {
       buildAddGrid();
@@ -862,8 +893,13 @@
     // Close modals on overlay click
     [selfModal, addModal, cardModal].forEach(modal => {
       modal.addEventListener('click', (e) => {
-        if (e.target === modal && modal !== selfModal) {
+        if (e.target === modal) {
+          // Allow closing self only if already have center (editing mode)
+          if (modal === selfModal && !state.centerId) return;
           modal.classList.remove('open');
+          if (modal === selfModal) {
+            document.getElementById('selfCancelBtn').style.display = 'none';
+          }
         }
       });
     });
@@ -873,7 +909,7 @@
     updateCounter();
 
     if (!state.centerId) {
-      buildSelfGrid();
+      buildSelfGrid(false);
       selfModal.classList.add('open');
     } else {
       showCenter();

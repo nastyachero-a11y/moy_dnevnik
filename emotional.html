@@ -271,12 +271,21 @@
       max-width: 90px;
       line-height: 1.2;
       text-shadow: 0 1px 6px rgba(0,0,0,0.5);
-      background: none;
-      border: none;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid transparent;
       font-family: inherit;
-      cursor: text;
-      padding: 2px 5px;
-      border-radius: 6px;
+      cursor: pointer;
+      padding: 6px 8px;
+      border-radius: 8px;
+      min-width: 56px;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    .star-label:active {
+      border-color: var(--lime);
+      background: rgba(0,0,0,0.45);
+      color: white;
     }
     .star-label:hover { color: var(--lime); }
     .star.filled .star-label { color: var(--gold); }
@@ -475,7 +484,12 @@
         padding: 12px;
       }
       .star-core { width: 28px; height: 28px; }
-      .star-label { font-size: 0.78rem; max-width: 88px; }
+      .star-label {
+        font-size: 0.82rem;
+        max-width: 100px;
+        padding: 8px 10px;
+        min-width: 64px;
+      }
     }
   </style>
 </head>
@@ -488,7 +502,7 @@
 
   <main>
     <p class="intro">Нажми на звезду — и посмотри на связь честно</p>
-    <p class="hint">Перетаскивай звёзды · Кликай, чтобы заполнить · Золотые сверкают</p>
+    <p class="hint">Перетаскивай звёзды · Кликай, чтобы заполнить</p>
 
     <div class="sky" id="sky">
       <svg class="constellation-lines" id="linesSvg"></svg>
@@ -594,7 +608,7 @@
         el.innerHTML = `
           <button class="star-delete" title="Удалить">×</button>
           <div class="star-core"></div>
-          <div class="star-label" contenteditable="true" spellcheck="false">${data.name}</div>
+          <div class="star-label" spellcheck="false">${data.name}</div>
         `;
 
         el.querySelector('.star-delete').addEventListener('click', (e) => {
@@ -606,16 +620,17 @@
         });
 
         const label = el.querySelector('.star-label');
-        label.addEventListener('click', e => e.stopPropagation());
-        label.addEventListener('mousedown', e => e.stopPropagation());
-        label.addEventListener('blur', () => {
-          const name = label.textContent.trim() || 'Звезда';
-          state.stars[id].name = name;
-          label.textContent = name;
-          save();
+        // Tap on name opens the same edit card
+        label.addEventListener('click', e => {
+          e.stopPropagation();
+          openPopup(id);
         });
-        label.addEventListener('keydown', e => {
-          if (e.key === 'Enter') { e.preventDefault(); label.blur(); }
+        label.addEventListener('mousedown', e => e.stopPropagation());
+        label.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
+        label.addEventListener('touchend', e => {
+          e.stopPropagation();
+          e.preventDefault();
+          openPopup(id);
         });
 
         el.addEventListener('click', (e) => {

@@ -165,7 +165,7 @@
     /* Fox */
     .fox-wrap {
       position: absolute;
-      bottom: 88px;
+      bottom: 100px;
       left: 50%;
       transform: translateX(-50%);
       width: 100px;
@@ -304,13 +304,13 @@
     .save-status.show { opacity: 1; }
 
     @media (max-width: 700px) {
-      .scene { gap: 12px; min-height: 240px; }
+      .scene { gap: 12px; min-height: 260px; padding-top: 30px; }
       .stool { width: 110px; }
       .stool-seat { width: 76px; height: 15px; }
       .stool-legs { width: 56px; }
       .stool-leg { width: 8px; height: 55px; }
       .stool-label { font-size: 0.75rem; max-width: 100px; }
-      .fox-wrap { width: 70px; height: 80px; bottom: 75px; }
+      .fox-wrap { width: 72px; height: 82px; bottom: 92px; }
       .cards-row { grid-template-columns: 1fr; }
     }
 
@@ -615,8 +615,14 @@
       const scene = document.getElementById('scene');
       const sceneRect = scene.getBoundingClientRect();
       const stoolRect = stool.getBoundingClientRect();
-      const centerX = stoolRect.left + stoolRect.width / 2 - sceneRect.left;
+      const seat = stool.querySelector('.stool-seat');
+      const seatRect = seat ? seat.getBoundingClientRect() : stoolRect;
+      const centerX = seatRect.left + seatRect.width / 2 - sceneRect.left;
+      // place fox so its bottom sits on the seat top
+      const foxH = fox.offsetHeight || 100;
+      const bottomFromScene = sceneRect.bottom - seatRect.top;
       fox.style.left = centerX + 'px';
+      fox.style.bottom = Math.max(60, bottomFromScene - 8) + 'px';
       state.last = key;
     }
 

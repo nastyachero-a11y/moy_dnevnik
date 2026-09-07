@@ -175,6 +175,28 @@
       100% { transform: scale(1); }
     }
 
+    /* === Stools icon: 1 → 3 on hover === */
+    .icon-stools .stool-side {
+      opacity: 0;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    .icon-stools .stool-left {
+      transform: translateX(8px);
+    }
+    .icon-stools .stool-right {
+      transform: translateX(-8px);
+    }
+    .icon-stools .stool-center {
+      transition: transform 0.35s ease;
+    }
+    .card:hover .icon-stools .stool-side {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .card:hover .icon-stools .stool-center {
+      transform: scale(0.92);
+    }
+
     .card h2 {
       font-size: 1.25rem;
       font-weight: 800;
@@ -282,12 +304,28 @@
         <p>Посмотри на ближний круг: кто, что раздражает, какие эмоции и как ты реагируешь</p>
       </a>
 
-      <!-- Карточка 3 — Галочка -->
+      <!-- Карточка 3 — Табуреты -->
       <a href="stools.html" class="card">
         <div class="card-icon">
-          <svg viewBox="0 0 48 48" fill="none">
-            <circle cx="24" cy="24" r="17" stroke="#ffffff" stroke-width="2.8"/>
-            <path d="M15.5 24.5 L21.5 30.5 L33.5 16.5" stroke="#a8ff3e" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg class="icon-stools" viewBox="0 0 48 48" fill="none">
+            <!-- Left stool (appears on hover) -->
+            <g class="stool-side stool-left">
+              <rect x="4" y="18" width="12" height="3.5" rx="1.2" fill="#ffffff"/>
+              <rect x="5.5" y="21.5" width="2.2" height="12" rx="1" fill="#a8ff3e"/>
+              <rect x="12.3" y="21.5" width="2.2" height="12" rx="1" fill="#a8ff3e"/>
+            </g>
+            <!-- Center stool (always visible) -->
+            <g class="stool-center">
+              <rect x="18" y="16" width="12" height="3.5" rx="1.2" fill="#ffffff"/>
+              <rect x="19.5" y="19.5" width="2.2" height="14" rx="1" fill="#a8ff3e"/>
+              <rect x="26.3" y="19.5" width="2.2" height="14" rx="1" fill="#a8ff3e"/>
+            </g>
+            <!-- Right stool (appears on hover) -->
+            <g class="stool-side stool-right">
+              <rect x="32" y="18" width="12" height="3.5" rx="1.2" fill="#ffffff"/>
+              <rect x="33.5" y="21.5" width="2.2" height="12" rx="1" fill="#a8ff3e"/>
+              <rect x="40.3" y="21.5" width="2.2" height="12" rx="1" fill="#a8ff3e"/>
+            </g>
           </svg>
         </div>
         <h2>Три табурета</h2>

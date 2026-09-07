@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Эмоциональная карта — Мой дорогой дневник</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --lime: #a8ff3e;
+      --gold: #ffd76a;
+      --gold-glow: rgba(255, 215, 106, 0.65);
+      --text: #e8f0ff;
+      --text-soft: #9bb0d0;
+      --radius: 18px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a1628;
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.45;
+      overflow-x: hidden;
+    }
+
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::before {
+      background-image:
+        radial-gradient(1.2px 1.2px at 3% 7%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 8% 22%, rgba(255,255,255,0.7) 50%, transparent),
+        radial-gradient(1.8px 1.8px at 14% 5%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 19% 38%, rgba(255,255,255,0.5) 50%, transparent),
+        radial-gradient(1.4px 1.4px at 25% 12%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 31% 48%, rgba(255,255,255,0.45) 50%, transparent),
+        radial-gradient(2px 2px at 37% 9%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 43% 28%, rgba(255,255,255,0.55) 50%, transparent),
+        radial-gradient(1.3px 1.3px at 49% 62%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 55% 18%, rgba(255,255,255,0.4) 50%, transparent),
+        radial-gradient(1.7px 1.7px at 61% 41%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 67% 55%, rgba(255,255,255,0.5) 50%, transparent),
+        radial-gradient(1.5px 1.5px at 73% 14%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 79% 33%, rgba(255,255,255,0.45) 50%, transparent),
+        radial-gradient(2px 2px at 85% 50%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 91% 22%, rgba(255,255,255,0.55) 50%, transparent),
+        radial-gradient(1.4px 1.4px at 96% 68%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 6% 70%, rgba(255,255,255,0.4) 50%, transparent),
+        radial-gradient(1.6px 1.6px at 12% 85%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 18% 58%, rgba(255,255,255,0.5) 50%, transparent),
+        radial-gradient(1.3px 1.3px at 24% 92%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 30% 75%, rgba(255,255,255,0.4) 50%, transparent),
+        radial-gradient(1.8px 1.8px at 36% 88%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 42% 65%, rgba(255,255,255,0.5) 50%, transparent),
+        radial-gradient(1.5px 1.5px at 48% 95%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 54% 78%, rgba(255,255,255,0.4) 50%, transparent),
+        radial-gradient(1.7px 1.7px at 60% 90%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 66% 72%, rgba(255,255,255,0.5) 50%, transparent),
+        radial-gradient(1.4px 1.4px at 72% 82%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 78% 95%, rgba(255,255,255,0.4) 50%, transparent),
+        radial-gradient(2px 2px at 84% 75%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 90% 88%, rgba(255,255,255,0.5) 50%, transparent),
+        radial-gradient(1.3px 1.3px at 97% 80%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 10% 45%, rgba(255,255,255,0.35) 50%, transparent),
+        radial-gradient(1.5px 1.5px at 50% 35%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 70% 48%, rgba(255,255,255,0.4) 50%, transparent),
+        radial-gradient(1.2px 1.2px at 88% 10%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 2% 55%, rgba(255,255,255,0.4) 50%, transparent);
+      animation: twinkleA 6s ease-in-out infinite alternate;
+    }
+
+    body::after {
+      background-image:
+        radial-gradient(1px 1px at 7% 15%, rgba(255,255,255,0.6) 50%, transparent),
+        radial-gradient(1.5px 1.5px at 16% 30%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 27% 6%, rgba(255,255,255,0.5) 50%, transparent),
+        radial-gradient(1.3px 1.3px at 38% 22%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 47% 40%, rgba(255,255,255,0.4) 50%, transparent),
+        radial-gradient(1.6px 1.6px at 58% 8%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 69% 25%, rgba(255,255,255,0.5) 50%, transparent),
+        radial-gradient(1.4px 1.4px at 81% 38%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 93% 15%, rgba(255,255,255,0.45) 50%, transparent),
+        radial-gradient(1.2px 1.2px at 4% 80%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 15% 68%, rgba(255,255,255,0.4) 50%, transparent),
+        radial-gradient(1.5px 1.5px at 26% 90%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 39% 70%, rgba(255,255,255,0.5) 50%, transparent),
+        radial-gradient(1.3px 1.3px at 51% 82%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 63% 92%, rgba(255,255,255,0.4) 50%, transparent),
+        radial-gradient(1.7px 1.7px at 76% 65%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 87% 85%, rgba(255,255,255,0.5) 50%, transparent),
+        radial-gradient(1.4px 1.4px at 98% 72%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 22% 50%, rgba(255,255,255,0.35) 50%, transparent),
+        radial-gradient(1.2px 1.2px at 45% 55%, #fff 50%, transparent),
+        radial-gradient(1px 1px at 68% 42%, rgba(255,255,255,0.4) 50%, transparent),
+        radial-gradient(1.5px 1.5px at 82% 58%, #fff 50%, transparent);
+      animation: twinkleB 7.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes twinkleA {
+      0%   { opacity: 0.55; }
+      50%  { opacity: 1; }
+      100% { opacity: 0.7; }
+    }
+    @keyframes twinkleB {
+      0%   { opacity: 0.9; }
+      50%  { opacity: 0.45; }
+      100% { opacity: 1; }
+    }
+
+    .top-bar {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: white;
+      padding: 9px 14px;
+      border-radius: 11px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.18); }
+
+    .page-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+    }
+
+    main {
+      position: relative;
+      z-index: 5;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 8px 16px 60px;
+    }
+
+    .intro {
+      text-align: center;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-soft);
+    }
+
+    .hint {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      margin-bottom: 12px;
+      opacity: 0.75;
+    }
+
+    .sky {
+      position: relative;
+      width: 100%;
+      height: 440px;
+      margin: 12px 0 24px;
+      border-radius: 20px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.06);
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .constellation-lines {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .constellation-lines line {
+      stroke: rgba(200, 220, 255, 0.28);
+      stroke-width: 0.9;
+      stroke-linecap: round;
+      stroke-dasharray: 3 6;
+    }
+
+    .star {
+      position: absolute;
+      z-index: 3;
+      cursor: grab;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.2s ease;
+      touch-action: none;
+    }
+    .star:active { cursor: grabbing; }
+    .star:hover { z-index: 8; }
+    .star.dragging { z-index: 20; transition: none; }
+
+    .star-core {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ffffff, #c8d8ff 55%, #8aa4d8);
+      box-shadow: 0 0 12px rgba(200,220,255,0.55), 0 0 24px rgba(168,255,62,0.12);
+      transition: all 0.4s ease;
+      position: relative;
+    }
+
+    .star:hover .star-core {
+      transform: scale(1.2);
+      box-shadow: 0 0 18px rgba(200,220,255,0.8), 0 0 40px rgba(168,255,62,0.3);
+    }
+
+    .star.filled .star-core {
+      background: radial-gradient(circle at 35% 35%, #fffef0, #ffd76a 50%, #e6a820);
+      box-shadow:
+        0 0 16px var(--gold-glow),
+        0 0 32px rgba(255,215,106,0.4),
+        0 0 50px rgba(255,215,106,0.2);
+      animation: sparkle 2.2s ease-in-out infinite;
+    }
+
+    @keyframes sparkle {
+      0%, 100% {
+        box-shadow:
+          0 0 14px var(--gold-glow),
+          0 0 28px rgba(255,215,106,0.35),
+          0 0 45px rgba(255,215,106,0.15);
+        transform: scale(1);
+      }
+      50% {
+        box-shadow:
+          0 0 22px var(--gold-glow),
+          0 0 48px rgba(255,215,106,0.55),
+          0 0 70px rgba(255,215,106,0.3);
+        transform: scale(1.12);
+      }
+    }
+
+    .star-label {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.85);
+      text-align: center;
+      max-width: 90px;
+      line-height: 1.2;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+      background: none;
+      border: none;
+      font-family: inherit;
+      cursor: text;
+      padding: 2px 5px;
+      border-radius: 6px;
+    }
+    .star-label:hover { color: var(--lime); }
+    .star.filled .star-label { color: var(--gold); }
+    .star-label:focus {
+      outline: 1px solid var(--lime);
+      background: rgba(0,0,0,0.4);
+      color: white;
+    }
+
+    .star-delete {
+      position: absolute;
+      top: -6px;
+      right: -10px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(255,80,80,0.85);
+      color: white;
+      font-size: 12px;
+      border: none;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      z-index: 5;
+    }
+    .star:hover .star-delete { display: flex; }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .add-star-btn {
+      background: linear-gradient(135deg, #1e4fd6, #2bb673);
+      border: none;
+      color: white;
+      padding: 12px 22px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(30,79,214,0.3);
+      transition: transform 0.2s;
+    }
+    .add-star-btn:hover { transform: translateY(-2px); }
+
+    .summary {
+      background: rgba(15, 25, 45, 0.75);
+      border: 1px solid rgba(168,255,62,0.15);
+      border-radius: 16px;
+      padding: 20px;
+    }
+    .summary label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--lime);
+      margin-bottom: 10px;
+    }
+    .summary textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 14px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--text);
+      min-height: 80px;
+      resize: vertical;
+      outline: none;
+    }
+    .summary textarea:focus { border-color: var(--lime); }
+
+    .save-status {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--lime);
+      opacity: 0;
+      transition: opacity 0.3s;
+      min-height: 22px;
+    }
+    .save-status.show { opacity: 1; }
+
+    .popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5,10,20,0.7);
+      backdrop-filter: blur(6px);
+      z-index: 50;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .popup-overlay.show { display: flex; }
+
+    .popup {
+      background: rgba(255,255,255,0.97);
+      border-radius: 20px;
+      padding: 26px 22px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      animation: popIn 0.3s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+      color: #1a1a2e;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.93) translateY(10px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .popup-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .popup-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #1e4fd6;
+    }
+    .popup-close {
+      background: rgba(0,0,0,0.06);
+      border: none;
+      color: #5a6280;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 1.15rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .popup-close:hover { background: rgba(0,0,0,0.12); }
+
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #5a6280;
+      margin-bottom: 5px;
+    }
+    .field input, .field textarea {
+      width: 100%;
+      background: #fafbff;
+      border: 1.5px solid #e0e4f0;
+      border-radius: 11px;
+      padding: 11px 13px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #1a1a2e;
+      outline: none;
+      resize: vertical;
+    }
+    .field input:focus, .field textarea:focus {
+      border-color: #2bb673;
+      box-shadow: 0 0 0 3px rgba(43,182,115,0.12);
+    }
+    .field textarea { min-height: 64px; }
+
+    .popup-save {
+      width: 100%;
+      margin-top: 6px;
+      padding: 13px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #1e4fd6, #2bb673);
+      color: white;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    @media (max-width: 600px) {
+      .sky { height: 380px; }
+      .star-core { width: 22px; height: 22px; }
+      .star-label { font-size: 0.7rem; max-width: 70px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a href="index.html" class="back-btn">← Назад</a>
+    <div class="page-title">Эмоциональная карта</div>
+    <div style="width:86px"></div>
+  </div>
+
+  <main>
+    <p class="intro">Нажми на звезду — и посмотри на связь честно</p>
+    <p class="hint">Перетаскивай звёзды · Кликай, чтобы заполнить · Золотые сверкают</p>
+
+    <div class="sky" id="sky">
+      <svg class="constellation-lines" id="linesSvg"></svg>
+    </div>
+
+    <div class="controls">
+      <button class="add-star-btn" id="addStarBtn">+ Добавить звезду</button>
+    </div>
+
+    <div class="summary">
+      <label>Что мне важнее всего?</label>
+      <textarea id="boundary" placeholder="Напиши то, что становится яснее после взгляда на созвездие..."></textarea>
+    </div>
+    <div class="save-status" id="saveStatus">Сохранено ✓</div>
+  </main>
+
+  <div class="popup-overlay" id="popupOverlay">
+    <div class="popup">
+      <div class="popup-header">
+        <div class="popup-title" id="popupTitle">Звезда</div>
+        <button class="popup-close" id="popupClose">×</button>
+      </div>
+      <div class="field">
+        <label>Имя звезды</label>
+        <input type="text" id="f-name" placeholder="Как назвать?">
+      </div>
+      <div class="field">
+        <label>Что именно раздражает</label>
+        <input type="text" id="f-irritates" placeholder="Слово, действие, тон...">
+      </div>
+      <div class="field">
+        <label>Какая эмоция возникает</label>
+        <input type="text" id="f-emotion" placeholder="Злость, обида, тревога...">
+      </div>
+      <div class="field">
+        <label>Что я делаю сейчас с этим</label>
+        <textarea id="f-current" placeholder="Как обычно реагирую..."></textarea>
+      </div>
+      <div class="field">
+        <label>Что я хочу попробовать сделать иначе</label>
+        <textarea id="f-hypothesis" placeholder="Гипотеза, новый способ..."></textarea>
+      </div>
+      <button class="popup-save" id="popupSave">Сохранить звезду</button>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'diary_emotional_v3';
+    const sky = document.getElementById('sky');
+    const linesSvg = document.getElementById('linesSvg');
+    let currentStarId = null;
+    let nextId = 6;
+
+    let state = {
+      stars: {
+        '1': { name: 'Звезда 1', x: 15, y: 12, irritates: '', emotion: '', current: '', hypothesis: '' },
+        '2': { name: 'Звезда 2', x: 78, y: 18, irritates: '', emotion: '', current: '', hypothesis: '' },
+        '3': { name: 'Звезда 3', x: 12, y: 52, irritates: '', emotion: '', current: '', hypothesis: '' },
+        '4': { name: 'Звезда 4', x: 82, y: 58, irritates: '', emotion: '', current: '', hypothesis: '' },
+        '5': { name: 'Я',        x: 48, y: 80, irritates: '', emotion: '', current: '', hypothesis: '' }
+      },
+      boundary: ''
+    };
+
+    function isFilled(s) {
+      return s.irritates.trim() && s.emotion.trim() && s.current.trim() && s.hypothesis.trim();
+    }
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      const st = document.getElementById('saveStatus');
+      st.classList.add('show');
+      setTimeout(() => st.classList.remove('show'), 1600);
+    }
+
+    function load() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (saved) {
+          state = { ...state, ...saved };
+          if (saved.stars) state.stars = saved.stars;
+          Object.keys(state.stars).forEach(id => {
+            const n = parseInt(id, 10);
+            if (n >= nextId) nextId = n + 1;
+          });
+        }
+      } catch(e) {}
+      document.getElementById('boundary').value = state.boundary || '';
+      renderStars();
+    }
+
+    function renderStars() {
+      sky.querySelectorAll('.star').forEach(el => el.remove());
+
+      Object.entries(state.stars).forEach(([id, data]) => {
+        const el = document.createElement('div');
+        el.className = 'star' + (isFilled(data) ? ' filled' : '');
+        el.dataset.id = id;
+        el.style.left = data.x + '%';
+        el.style.top = data.y + '%';
+        el.style.transform = 'translate(-50%, -50%)';
+
+        el.innerHTML = `
+          <button class="star-delete" title="Удалить">×</button>
+          <div class="star-core"></div>
+          <div class="star-label" contenteditable="true" spellcheck="false">${data.name}</div>
+        `;
+
+        el.querySelector('.star-delete').addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (Object.keys(state.stars).length <= 1) return;
+          delete state.stars[id];
+          save();
+          renderStars();
+        });
+
+        const label = el.querySelector('.star-label');
+        label.addEventListener('click', e => e.stopPropagation());
+        label.addEventListener('mousedown', e => e.stopPropagation());
+        label.addEventListener('blur', () => {
+          const name = label.textContent.trim() || 'Звезда';
+          state.stars[id].name = name;
+          label.textContent = name;
+          save();
+        });
+        label.addEventListener('keydown', e => {
+          if (e.key === 'Enter') { e.preventDefault(); label.blur(); }
+        });
+
+        el.addEventListener('click', (e) => {
+          if (e.target.classList.contains('star-label') || e.target.classList.contains('star-delete')) return;
+          if (el.classList.contains('dragging')) return;
+          openPopup(id);
+        });
+
+        makeDraggable(el, id);
+        sky.appendChild(el);
+      });
+
+      drawLines();
+    }
+
+    function drawLines() {
+      const ids = Object.keys(state.stars);
+      linesSvg.innerHTML = '';
+      linesSvg.setAttribute('viewBox', '0 0 100 100');
+      linesSvg.setAttribute('preserveAspectRatio', 'none');
+
+      for (let i = 0; i < ids.length; i++) {
+        for (let j = i + 1; j < ids.length; j++) {
+          const a = state.stars[ids[i]];
+          const b = state.stars[ids[j]];
+          const dist = Math.hypot(a.x - b.x, a.y - b.y);
+          if (dist < 55) {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', a.x);
+            line.setAttribute('y1', a.y);
+            line.setAttribute('x2', b.x);
+            line.setAttribute('y2', b.y);
+            linesSvg.appendChild(line);
+          }
+        }
+      }
+    }
+
+    function makeDraggable(el, id) {
+      let startX, startY, origX, origY, moved = false;
+
+      function onStart(e) {
+        if (e.target.classList.contains('star-label') || e.target.classList.contains('star-delete')) return;
+        e.preventDefault();
+        moved = false;
+        el.classList.add('dragging');
+        const point = e.touches ? e.touches[0] : e;
+        startX = point.clientX;
+        startY = point.clientY;
+        origX = state.stars[id].x;
+        origY = state.stars[id].y;
+
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onEnd);
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('touchend', onEnd);
+      }
+
+      function onMove(e) {
+        e.preventDefault();
+        const point = e.touches ? e.touches[0] : e;
+        const dx = point.clientX - startX;
+        const dy = point.clientY - startY;
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
+
+        const rect = sky.getBoundingClientRect();
+        let newX = origX + (dx / rect.width) * 100;
+        let newY = origY + (dy / rect.height) * 100;
+        newX = Math.max(4, Math.min(96, newX));
+        newY = Math.max(4, Math.min(96, newY));
+
+        state.stars[id].x = newX;
+        state.stars[id].y = newY;
+        el.style.left = newX + '%';
+        el.style.top = newY + '%';
+        drawLines();
+      }
+
+      function onEnd() {
+        el.classList.remove('dragging');
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onEnd);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend', onEnd);
+        if (moved) {
+          save();
+          setTimeout(() => { el.dataset.justDragged = '1'; }, 0);
+        }
+      }
+
+      el.addEventListener('mousedown', onStart);
+      el.addEventListener('touchstart', onStart, { passive: false });
+    }
+
+    function openPopup(id) {
+      const el = sky.querySelector('.star[data-id="' + id + '"]');
+      if (el && el.dataset.justDragged) {
+        delete el.dataset.justDragged;
+        return;
+      }
+      currentStarId = id;
+      const data = state.stars[id];
+      document.getElementById('popupTitle').textContent = data.name;
+      document.getElementById('f-name').value = data.name || '';
+      document.getElementById('f-irritates').value = data.irritates || '';
+      document.getElementById('f-emotion').value = data.emotion || '';
+      document.getElementById('f-current').value = data.current || '';
+      document.getElementById('f-hypothesis').value = data.hypothesis || '';
+      document.getElementById('popupOverlay').classList.add('show');
+    }
+
+    function closePopup() {
+      document.getElementById('popupOverlay').classList.remove('show');
+      currentStarId = null;
+    }
+
+    document.getElementById('popupClose').addEventListener('click', closePopup);
+    document.getElementById('popupOverlay').addEventListener('click', e => {
+      if (e.target === document.getElementById('popupOverlay')) closePopup();
+    });
+
+    document.getElementById('popupSave').addEventListener('click', () => {
+      if (!currentStarId) return;
+      const name = document.getElementById('f-name').value.trim() || 'Звезда';
+      state.stars[currentStarId].name = name;
+      state.stars[currentStarId].irritates = document.getElementById('f-irritates').value;
+      state.stars[currentStarId].emotion = document.getElementById('f-emotion').value;
+      state.stars[currentStarId].current = document.getElementById('f-current').value;
+      state.stars[currentStarId].hypothesis = document.getElementById('f-hypothesis').value;
+      save();
+      renderStars();
+      closePopup();
+    });
+
+    document.getElementById('addStarBtn').addEventListener('click', () => {
+      const id = String(nextId++);
+      state.stars[id] = {
+        name: 'Новая звезда',
+        x: 40 + Math.random() * 20,
+        y: 35 + Math.random() * 25,
+        irritates: '', emotion: '', current: '', hypothesis: ''
+      };
+      save();
+      renderStars();
+    });
+
+    document.getElementById('boundary').addEventListener('input', e => {
+      state.boundary = e.target.value;
+      save();
+    });
+
+    load();
+  </script>
+</body>
+</html>

@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Три табурета — Мой дорогой дневник</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --wood: #c49a6c;
+      --wood-dark: #8b6914;
+      --wood-light: #e8c9a0;
+      --cream: #faf6f0;
+      --text: #2c2416;
+      --text-soft: #6b5c4a;
+      --lime: #2bb673;
+      --blue: #1e4fd6;
+      --radius: 18px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(165deg, #1a3a9c 0%, #1e6fd9 35%, #2bb673 75%, #3dd68c 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.45;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: white;
+      padding: 9px 14px;
+      border-radius: 11px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.25); }
+
+    .page-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: white;
+    }
+
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 8px 16px 60px;
+    }
+
+    .intro {
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.9);
+    }
+
+    .hint {
+      text-align: center;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 28px;
+    }
+
+    /* Scene */
+    .scene {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 28px;
+      min-height: 280px;
+      margin-bottom: 32px;
+      padding: 20px 10px 0;
+      flex-wrap: wrap;
+    }
+
+    /* Stool */
+    .stool {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.25s ease;
+      position: relative;
+      width: 160px;
+    }
+    .stool:hover { transform: translateY(-6px); }
+    .stool.active .stool-seat {
+      box-shadow: 0 0 0 3px var(--lime), 0 8px 20px rgba(0,0,0,0.15);
+    }
+    .stool.filled .stool-label {
+      color: #a8ff3e;
+    }
+
+    .stool-seat {
+      width: 100px;
+      height: 18px;
+      background: linear-gradient(180deg, #e0b87a, #c49a6c 40%, #a67c52);
+      border-radius: 6px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      position: relative;
+      z-index: 2;
+    }
+    .stool-seat::before {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 12%;
+      right: 12%;
+      height: 3px;
+      background: rgba(255,255,255,0.22);
+      border-radius: 2px;
+    }
+
+    .stool-legs {
+      display: flex;
+      justify-content: space-between;
+      width: 72px;
+      margin-top: -1px;
+      z-index: 1;
+    }
+    .stool-leg {
+      width: 9px;
+      height: 68px;
+      background: linear-gradient(90deg, #6b4a28, #a67c52 40%, #6b4a28);
+      border-radius: 3px;
+      box-shadow: 2px 3px 8px rgba(0,0,0,0.2);
+    }
+
+    .stool-label {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      text-align: center;
+      color: white;
+      line-height: 1.3;
+      max-width: 140px;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.3);
+    }
+
+    /* Fox */
+    .fox-wrap {
+      position: absolute;
+      bottom: 88px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 110px;
+      z-index: 10;
+      transition: left 0.65s cubic-bezier(0.34, 1.2, 0.64, 1);
+      pointer-events: none;
+    }
+    .fox-wrap img {
+      width: 100%;
+      height: auto;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25));
+      transition: transform 0.3s ease;
+      background: transparent;
+    }
+
+    /* Fox reactions — more visible */
+    .fox-wrap.nod img { animation: nod 0.8s ease; }
+    .fox-wrap.eyeroll img { animation: eyeroll 0.9s ease; }
+    .fox-wrap.facepalm img { animation: facepalm 1s ease; }
+
+    @keyframes nod {
+      0%   { transform: rotate(0deg) translateY(0); }
+      20%  { transform: rotate(18deg) translateY(4px); }
+      40%  { transform: rotate(-14deg) translateY(0); }
+      60%  { transform: rotate(12deg) translateY(3px); }
+      80%  { transform: rotate(-6deg) translateY(0); }
+      100% { transform: rotate(0deg) translateY(0); }
+    }
+    @keyframes eyeroll {
+      0%   { transform: rotate(0deg) scale(1); }
+      25%  { transform: rotate(-22deg) scale(1.08) translateY(-6px); }
+      50%  { transform: rotate(16deg) scale(1.05) translateY(2px); }
+      75%  { transform: rotate(-10deg) scale(1.03); }
+      100% { transform: rotate(0deg) scale(1); }
+    }
+    @keyframes facepalm {
+      0%   { transform: translateY(0) rotate(0) scale(1); }
+      30%  { transform: translateY(14px) rotate(-18deg) scale(0.95); }
+      55%  { transform: translateY(10px) rotate(8deg) scale(0.97); }
+      80%  { transform: translateY(6px) rotate(-5deg); }
+      100% { transform: translateY(0) rotate(0) scale(1); }
+    }
+
+    /* Cards under stools */
+    .cards-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 20px 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.07);
+      border: 1px solid rgba(139,105,20,0.1);
+      transition: box-shadow 0.25s, border-color 0.25s;
+    }
+    .card.active {
+      border-color: var(--lime);
+      box-shadow: 0 8px 28px rgba(43,182,115,0.15);
+    }
+    .card.filled {
+      border-color: rgba(43,182,115,0.4);
+    }
+
+    .card h3 {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--blue);
+      margin-bottom: 10px;
+    }
+
+    .card .question {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-soft);
+      margin-bottom: 12px;
+      line-height: 1.4;
+      font-style: italic;
+    }
+
+    .card textarea {
+      width: 100%;
+      min-height: 90px;
+      border: 1.5px solid #e8e0d4;
+      border-radius: 12px;
+      padding: 12px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text);
+      resize: vertical;
+      outline: none;
+      background: #faf8f5;
+      transition: border-color 0.2s;
+    }
+    .card textarea:focus {
+      border-color: var(--lime);
+      box-shadow: 0 0 0 3px rgba(43,182,115,0.12);
+    }
+    .card textarea::placeholder { color: #b0a090; }
+
+    /* Result */
+    .result {
+      text-align: center;
+      padding: 22px;
+      background: rgba(43,182,115,0.1);
+      border: 1px solid rgba(43,182,115,0.3);
+      border-radius: 16px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--lime);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.4s, transform 0.4s;
+      pointer-events: none;
+    }
+    .result.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .save-status {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--lime);
+      opacity: 0;
+      transition: opacity 0.3s;
+      min-height: 20px;
+    }
+    .save-status.show { opacity: 1; }
+
+    @media (max-width: 700px) {
+      .scene { gap: 12px; min-height: 240px; }
+      .stool { width: 110px; }
+      .stool-seat { width: 76px; height: 15px; }
+      .stool-legs { width: 56px; }
+      .stool-leg { width: 8px; height: 55px; }
+      .stool-label { font-size: 0.75rem; max-width: 100px; }
+      .fox-wrap { width: 70px; height: 80px; bottom: 75px; }
+      .cards-row { grid-template-columns: 1fr; }
+    }
+
+    /* Decision block */
+    .decision {
+      display: none;
+      margin-top: 8px;
+      margin-bottom: 24px;
+      animation: fadeUp 0.45s ease;
+    }
+    .decision.show { display: block; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .decision-title {
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 16px;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.25);
+    }
+
+    .decision-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .decision-btn {
+      background: rgba(255,255,255,0.94);
+      border: 2px solid transparent;
+      border-radius: 16px;
+      padding: 18px 14px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.25s ease;
+      font-family: inherit;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+    .decision-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.15);
+    }
+    .decision-btn.selected {
+      border-color: #2bb673;
+      box-shadow: 0 0 0 3px rgba(43,182,115,0.2), 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .decision-btn .btn-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #1e4fd6;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .decision-btn .btn-desc {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #6b5c4a;
+      line-height: 1.35;
+    }
+
+    .decision-field {
+      display: none;
+      background: rgba(255,255,255,0.94);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      animation: fadeUp 0.35s ease;
+    }
+    .decision-field.show { display: block; }
+
+    .decision-field label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #1e4fd6;
+      margin-bottom: 10px;
+    }
+    .decision-field textarea {
+      width: 100%;
+      min-height: 80px;
+      border: 1.5px solid #e8e0d4;
+      border-radius: 12px;
+      padding: 12px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #2c2416;
+      resize: vertical;
+      outline: none;
+      background: #faf8f5;
+    }
+    .decision-field textarea:focus {
+      border-color: #2bb673;
+      box-shadow: 0 0 0 3px rgba(43,182,115,0.12);
+    }
+
+    @media (max-width: 700px) {
+      .decision-options { grid-template-columns: 1fr; }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a href="index.html" class="back-btn">← Назад</a>
+    <div class="page-title">Три табурета</div>
+    <div style="width:86px"></div>
+  </div>
+
+  <main>
+    <p class="intro">На каком табурете ты сидишь прямо сейчас?</p>
+    <p class="hint">Кликни на табурет или пиши прямо в карточку внизу</p>
+
+    <div class="scene" id="scene">
+      <div class="fox-wrap" id="fox">
+        <img src="fox.png" alt="Уставшая лиса">
+      </div>
+
+      <div class="stool" data-key="mine" id="stool-mine">
+        <div class="stool-seat"></div>
+        <div class="stool-legs">
+          <div class="stool-leg"></div>
+          <div class="stool-leg"></div>
+        </div>
+        <div class="stool-label">Моё</div>
+      </div>
+
+      <div class="stool" data-key="other" id="stool-other">
+        <div class="stool-seat"></div>
+        <div class="stool-legs">
+          <div class="stool-leg"></div>
+          <div class="stool-leg"></div>
+        </div>
+        <div class="stool-label">Чужое</div>
+      </div>
+
+      <div class="stool" data-key="must" id="stool-must">
+        <div class="stool-seat"></div>
+        <div class="stool-legs">
+          <div class="stool-leg"></div>
+          <div class="stool-leg"></div>
+        </div>
+        <div class="stool-label">Не моё, но<br>нужно сейчас</div>
+      </div>
+    </div>
+
+    <div class="cards-row">
+      <div class="card" data-key="mine" id="card-mine">
+        <h3>Моё</h3>
+        <div class="question">«Если бы никто никогда не узнал, я бы всё равно это хотел?»</div>
+        <textarea id="text-mine" placeholder="Честный ответ..."></textarea>
+      </div>
+
+      <div class="card" data-key="other" id="card-other">
+        <h3>Чужое</h3>
+        <div class="question">«Чей голос в моей голове говорит „надо“?»</div>
+        <textarea id="text-other" placeholder="Чей это голос..."></textarea>
+      </div>
+
+      <div class="card" data-key="must" id="card-must">
+        <h3>Не моё, но нужно сейчас</h3>
+        <div class="question">«Я выбираю это не потому что хочу, а потому что так необходимо?»</div>
+        <textarea id="text-must" placeholder="Почему это нужно..."></textarea>
+      </div>
+    </div>
+
+    <div class="decision" id="decision">
+      <div class="decision-title">Что ты выбираешь?</div>
+      <div class="decision-options">
+        <button class="decision-btn" data-choice="refuse" type="button">
+          <span class="btn-title">Отказаться</span>
+          <span class="btn-desc">«Я не обязан хотеть того, что хотят другие»</span>
+        </button>
+        <button class="decision-btn" data-choice="reframe" type="button">
+          <span class="btn-title">Переформулировать</span>
+          <span class="btn-desc">«Я выполняю цель, но поправлю её формулировку, ориентируясь на себя»</span>
+        </button>
+        <button class="decision-btn" data-choice="keep" type="button">
+          <span class="btn-title">Оставить, но честно</span>
+          <span class="btn-desc">«Это сейчас для меня необходимо»</span>
+        </button>
+      </div>
+
+      <div class="decision-field" id="field-refuse">
+        <label>От чего я решаю отказаться?</label>
+        <textarea id="text-refuse" placeholder="Напиши свой вывод..."></textarea>
+      </div>
+      <div class="decision-field" id="field-reframe">
+        <label>Как я переформулирую эту цель для себя?</label>
+        <textarea id="text-reframe" placeholder="Напиши свой вывод..."></textarea>
+      </div>
+      <div class="decision-field" id="field-keep">
+        <label>Почему я оставляю это, даже если это не моё?</label>
+        <textarea id="text-keep" placeholder="Напиши свой вывод..."></textarea>
+      </div>
+    </div>
+
+    <div class="result" id="result">Ты выбрал(а) свой табурет. Садись и дыши</div>
+    <div class="save-status" id="saveStatus">Сохранено ✓</div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'diary_stools_v1';
+    const fox = document.getElementById('fox');
+    const stools = {
+      mine: document.getElementById('stool-mine'),
+      other: document.getElementById('stool-other'),
+      must: document.getElementById('stool-must')
+    };
+    const cards = {
+      mine: document.getElementById('card-mine'),
+      other: document.getElementById('card-other'),
+      must: document.getElementById('card-must')
+    };
+    const texts = {
+      mine: document.getElementById('text-mine'),
+      other: document.getElementById('text-other'),
+      must: document.getElementById('text-must')
+    };
+
+    let state = { mine: '', other: '', must: '', last: 'mine', choice: '', refuse: '', reframe: '', keep: '' };
+
+    const reactions = {
+      mine: 'nod',
+      other: 'eyeroll',
+      must: 'facepalm'
+    };
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      const st = document.getElementById('saveStatus');
+      st.classList.add('show');
+      setTimeout(() => st.classList.remove('show'), 1500);
+    }
+
+    function load() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (saved) state = { ...state, ...saved };
+      } catch(e) {}
+      texts.mine.value = state.mine || '';
+      texts.other.value = state.other || '';
+      texts.must.value = state.must || '';
+      document.getElementById('text-refuse').value = state.refuse || '';
+      document.getElementById('text-reframe').value = state.reframe || '';
+      document.getElementById('text-keep').value = state.keep || '';
+      updateUI();
+      moveFox(state.last || 'mine');
+      if (state.choice === 'refuse') {
+        // fox leaves a bit
+        fox.style.opacity = '0.35';
+      } else {
+        fox.style.opacity = '1';
+      }
+    }
+
+    function allFilled() {
+      return state.mine.trim() && state.other.trim() && state.must.trim();
+    }
+
+    function updateUI() {
+      ['mine', 'other', 'must'].forEach(key => {
+        if (state[key].trim()) {
+          stools[key].classList.add('filled');
+          cards[key].classList.add('filled');
+        } else {
+          stools[key].classList.remove('filled');
+          cards[key].classList.remove('filled');
+        }
+      });
+
+      const decision = document.getElementById('decision');
+      const result = document.getElementById('result');
+      if (allFilled()) {
+        decision.classList.add('show');
+        result.classList.add('show');
+      } else {
+        decision.classList.remove('show');
+        result.classList.remove('show');
+      }
+
+      // restore selected choice
+      document.querySelectorAll('.decision-btn').forEach(btn => {
+        btn.classList.toggle('selected', btn.dataset.choice === state.choice);
+      });
+      document.querySelectorAll('.decision-field').forEach(f => f.classList.remove('show'));
+      if (state.choice) {
+        const field = document.getElementById('field-' + state.choice);
+        if (field) field.classList.add('show');
+      }
+    }
+
+    function moveFox(key) {
+      const stool = stools[key];
+      const scene = document.getElementById('scene');
+      const sceneRect = scene.getBoundingClientRect();
+      const stoolRect = stool.getBoundingClientRect();
+      const centerX = stoolRect.left + stoolRect.width / 2 - sceneRect.left;
+      fox.style.left = centerX + 'px';
+      state.last = key;
+    }
+
+    function react(key) {
+      const img = fox.querySelector('img');
+      fox.classList.remove('nod', 'eyeroll', 'facepalm');
+      if (img) {
+        img.style.animation = 'none';
+        void img.offsetWidth; // force reflow
+        img.style.animation = '';
+      }
+      void fox.offsetWidth;
+      fox.classList.add(reactions[key]);
+      setTimeout(() => fox.classList.remove(reactions[key]), 1100);
+    }
+
+    function focusKey(key) {
+      Object.values(stools).forEach(s => s.classList.remove('active'));
+      Object.values(cards).forEach(c => c.classList.remove('active'));
+      stools[key].classList.add('active');
+      cards[key].classList.add('active');
+      moveFox(key);
+      react(key);
+      texts[key].focus();
+    }
+
+    // Stool clicks
+    Object.entries(stools).forEach(([key, el]) => {
+      el.addEventListener('click', () => focusKey(key));
+    });
+
+    // Text inputs
+    Object.entries(texts).forEach(([key, el]) => {
+      el.addEventListener('focus', () => {
+        Object.values(stools).forEach(s => s.classList.remove('active'));
+        Object.values(cards).forEach(c => c.classList.remove('active'));
+        stools[key].classList.add('active');
+        cards[key].classList.add('active');
+        moveFox(key);
+        react(key);
+      });
+      el.addEventListener('input', () => {
+        state[key] = el.value;
+        state.last = key;
+        updateUI();
+        save();
+      });
+    });
+
+
+    // Decision choices
+    document.querySelectorAll('.decision-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const choice = btn.dataset.choice;
+        state.choice = choice;
+        document.querySelectorAll('.decision-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        document.querySelectorAll('.decision-field').forEach(f => f.classList.remove('show'));
+        document.getElementById('field-' + choice).classList.add('show');
+
+        if (choice === 'refuse') {
+          fox.style.transition = 'left 0.8s ease, opacity 0.8s ease';
+          fox.style.left = '8%';
+          fox.style.opacity = '0.3';
+          react('other');
+        } else if (choice === 'reframe') {
+          fox.style.opacity = '1';
+          moveFox('mine');
+          react('mine');
+        } else {
+          fox.style.opacity = '1';
+          moveFox(state.last || 'must');
+          react('must');
+        }
+        save();
+      });
+    });
+
+    ['refuse', 'reframe', 'keep'].forEach(key => {
+      const el = document.getElementById('text-' + key);
+      if (el) {
+        el.addEventListener('input', (e) => {
+          state[key] = e.target.value;
+          save();
+        });
+      }
+    });
+
+    // Initial fox position after layout
+    window.addEventListener('load', () => {
+      load();
+      setTimeout(() => moveFox(state.last || 'mine'), 50);
+    });
+    window.addEventListener('resize', () => moveFox(state.last || 'mine'));
+  </script>
+</body>
+</html>

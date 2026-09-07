@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Карта зон влияния — Мой дорогой дневник</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #1e4fd6;
+      --lime: #a8ff3e;
+      --green: #2bb673;
+      --text: #1a1a2e;
+      --text-soft: #5a6280;
+      --white: #ffffff;
+      --radius: 16px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(165deg, #1a3a9c 0%, #1e6fd9 35%, #2bb673 75%, #3dd68c 100%);
+      background-attachment: fixed;
+      color: var(--white);
+      min-height: 100vh;
+      line-height: 1.45;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: white;
+      padding: 9px 14px;
+      border-radius: 11px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.25); }
+
+    .page-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 8px 16px 60px;
+    }
+
+    .intro {
+      text-align: center;
+      margin-bottom: 28px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      opacity: 0.9;
+    }
+
+    .category {
+      background: rgba(255,255,255,0.95);
+      border-radius: var(--radius);
+      padding: 22px 18px 18px;
+      margin-bottom: 24px;
+      box-shadow: 0 10px 32px rgba(0,0,0,0.14);
+      color: var(--text);
+    }
+
+    .cat-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .cat-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e4fd6, #2bb673);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .cat-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #1e4fd6;
+      background: linear-gradient(90deg, #d4f0ff, #e8fff0);
+      padding: 4px 12px;
+      border-radius: 8px;
+      display: inline-block;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid #e4e8f5;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 560px;
+    }
+
+    th {
+      background: #f0f4ff;
+      color: #1e4fd6;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-align: left;
+      padding: 12px 14px;
+      border-bottom: 1px solid #e0e6f5;
+    }
+
+    td {
+      padding: 6px;
+      border-bottom: 1px solid #eef1f8;
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    td input, td select {
+      width: 100%;
+      border: 1.5px solid transparent;
+      background: #fafbff;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    td input:focus, td select:focus {
+      border-color: #2bb673;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(43,182,115,0.12);
+    }
+
+    td input::placeholder { color: #b0b8d0; }
+
+    .add-row-btn {
+      margin-top: 12px;
+      background: none;
+      border: 1.5px dashed #b8c4e0;
+      color: #5a6a9a;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+    }
+    .add-row-btn:hover {
+      border-color: #2bb673;
+      color: #2bb673;
+      background: rgba(43,182,115,0.06);
+    }
+
+    .actions {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .build-btn {
+      width: 100%;
+      max-width: 420px;
+      padding: 16px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #1e4fd6, #2bb673);
+      color: white;
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 28px rgba(30,79,214,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .build-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(30,79,214,0.45);
+    }
+
+    .save-status {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--lime);
+      min-height: 22px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .save-status.show { opacity: 1; }
+
+    .result-section {
+      display: none;
+      margin-top: 36px;
+      animation: fadeUp 0.5s ease;
+    }
+    .result-section.show { display: block; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-title {
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: var(--lime);
+      text-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    }
+
+    .result-sub {
+      text-align: center;
+      font-size: 0.9rem;
+      opacity: 0.85;
+      margin-bottom: 32px;
+    }
+
+    /* Three separate routes */
+    .route-block {
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 24px 18px 28px;
+      border: 1px solid rgba(255,255,255,0.2);
+      margin-bottom: 28px;
+    }
+
+    .route-block-title {
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .route-block-title .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .route-block-title .dot.action { background: #3b6ef5; }
+    .route-block-title .dot.influence { background: #2bb673; }
+    .route-block-title .dot.accept { background: #e67e22; }
+
+    .route-visual {
+      position: relative;
+      min-height: 120px;
+      padding: 10px 0;
+    }
+
+    /* Curved path using SVG */
+    .route-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .route-svg path {
+      fill: none;
+      stroke: rgba(168, 255, 62, 0.7);
+      stroke-width: 3;
+      stroke-dasharray: 8 7;
+      stroke-linecap: round;
+      filter: drop-shadow(0 0 6px rgba(168, 255, 62, 0.4));
+    }
+
+    .route-nodes {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 36px;
+    }
+
+    .route-node {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      max-width: 520px;
+    }
+
+    .route-node:nth-child(odd) {
+      margin-right: auto;
+      margin-left: 8%;
+    }
+
+    .route-node:nth-child(even) {
+      margin-left: auto;
+      margin-right: 8%;
+      flex-direction: row-reverse;
+    }
+
+    .node-pin {
+      width: 36px;
+      height: 36px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      background: linear-gradient(135deg, #1e4fd6, #2bb673);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      position: relative;
+      z-index: 3;
+    }
+
+    .node-pin span {
+      transform: rotate(45deg);
+      font-size: 14px;
+      color: white;
+      font-weight: 800;
+    }
+
+    .node-pin.flag {
+      border-radius: 4px;
+      transform: none;
+      background: linear-gradient(135deg, #2bb673, #a8ff3e);
+      width: 32px;
+      height: 32px;
+    }
+    .node-pin.flag span {
+      transform: none;
+      color: #1a1a2e;
+    }
+
+    .node-card {
+      background: rgba(255,255,255,0.95);
+      border-radius: 14px;
+      padding: 14px 16px;
+      color: var(--text);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+      flex: 1;
+      min-width: 0;
+    }
+
+    .node-card .node-text {
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .node-card .node-meta {
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      font-weight: 500;
+    }
+
+    .route-empty {
+      text-align: center;
+      padding: 24px;
+      opacity: 0.65;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .note-box {
+      margin-top: 8px;
+      background: rgba(255,200,100,0.15);
+      border: 1px solid rgba(255,200,100,0.35);
+      border-radius: 14px;
+      padding: 16px 18px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .note-box strong { color: var(--lime); }
+
+    @media (max-width: 600px) {
+      .route-node:nth-child(odd),
+      .route-node:nth-child(even) {
+        margin-left: 0;
+        margin-right: 0;
+        flex-direction: row;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .cat-title { font-size: 0.92rem; }
+      th { font-size: 0.75rem; padding: 10px 8px; }
+      td input, td select { font-size: 0.84rem; padding: 9px 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a href="index.html" class="back-btn">← Назад</a>
+    <div class="page-title">Карта зон влияния</div>
+    <div style="width:86px"></div>
+  </div>
+
+  <main>
+    <p class="intro">Заполни таблицы — потом построим твой маршрут</p>
+
+    <!-- CATEGORY 1 -->
+    <div class="category" id="cat1">
+      <div class="cat-header">
+        <div class="cat-num">1</div>
+        <div class="cat-title">Могу изменить действием</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:34%">Ситуация, которая волнует</th>
+              <th style="width:33%">Действие, которым её можно решить</th>
+              <th style="width:33%">Какие ресурсы для этого нужны</th>
+            </tr>
+          </thead>
+          <tbody id="tbody1"></tbody>
+        </table>
+      </div>
+      <button class="add-row-btn" onclick="addRow(1)">+ Добавить строку</button>
+    </div>
+
+    <!-- CATEGORY 2 -->
+    <div class="category" id="cat2">
+      <div class="cat-header">
+        <div class="cat-num">2</div>
+        <div class="cat-title">Могу повлиять через других</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:34%">Ситуация, которая волнует</th>
+              <th style="width:33%">Ресурс / человек, которого можно привлечь</th>
+              <th style="width:33%">Какие ресурсы для этого нужны</th>
+            </tr>
+          </thead>
+          <tbody id="tbody2"></tbody>
+        </table>
+      </div>
+      <button class="add-row-btn" onclick="addRow(2)">+ Добавить строку</button>
+    </div>
+
+    <!-- CATEGORY 3 -->
+    <div class="category" id="cat3">
+      <div class="cat-header">
+        <div class="cat-num">3</div>
+        <div class="cat-title">Могу только принять</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:34%">Ситуация, которая волнует</th>
+              <th style="width:33%">Есть ли теоретическое решение?</th>
+              <th style="width:33%">Можешь ли ты на это повлиять хотя бы как-то?</th>
+            </tr>
+          </thead>
+          <tbody id="tbody3"></tbody>
+        </table>
+      </div>
+      <button class="add-row-btn" onclick="addRow(3)">+ Добавить строку</button>
+    </div>
+
+    <div class="actions">
+      <button class="build-btn" id="buildBtn">Построить маршрут</button>
+      <div class="save-status" id="saveStatus">Сохранено ✓</div>
+    </div>
+
+    <!-- RESULT MAP -->
+    <div class="result-section" id="resultSection">
+      <div class="result-title">✦ Твои маршруты построены</div>
+      <div class="result-sub">Три отдельных пути — по одной зоне влияния</div>
+
+      <div id="routesContainer"></div>
+
+      <div class="note-box" id="noteBox" style="display:none">
+        <strong>Важно:</strong> Если в категории «Могу только принять» хотя бы на один вопрос ответ «нет» — нет причин дальше размышлять об этой ситуации и накручивать себя.
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'diary_zones_v2';
+
+    function emptyRow(cat) {
+      if (cat === 3) return { situation: '', solution: '', influence: '' };
+      return { situation: '', action: '', resources: '' };
+    }
+
+    function makeInput(value, placeholder, onChange) {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = value || '';
+      input.placeholder = placeholder;
+      input.addEventListener('input', onChange);
+      return input;
+    }
+
+    function makeSelect(value, onChange) {
+      const select = document.createElement('select');
+      ['', 'да', 'нет'].forEach(opt => {
+        const o = document.createElement('option');
+        o.value = opt;
+        o.textContent = opt === '' ? '—' : opt;
+        if (opt === value) o.selected = true;
+        select.appendChild(o);
+      });
+      select.addEventListener('change', onChange);
+      return select;
+    }
+
+    function renderTable(cat) {
+      const tbody = document.getElementById('tbody' + cat);
+      tbody.innerHTML = '';
+      const data = state['cat' + cat];
+
+      data.forEach((row, idx) => {
+        const tr = document.createElement('tr');
+
+        const td1 = document.createElement('td');
+        td1.appendChild(makeInput(row.situation, 'Опиши ситуацию...', (e) => {
+          state['cat' + cat][idx].situation = e.target.value;
+          autoSave();
+        }));
+        tr.appendChild(td1);
+
+        if (cat === 3) {
+          const td2 = document.createElement('td');
+          td2.appendChild(makeSelect(row.solution, (e) => {
+            state.cat3[idx].solution = e.target.value;
+            autoSave();
+          }));
+          tr.appendChild(td2);
+
+          const td3 = document.createElement('td');
+          td3.appendChild(makeSelect(row.influence, (e) => {
+            state.cat3[idx].influence = e.target.value;
+            autoSave();
+          }));
+          tr.appendChild(td3);
+        } else {
+          const td2 = document.createElement('td');
+          const ph2 = cat === 1 ? 'Какое действие?' : 'Кого привлечь?';
+          td2.appendChild(makeInput(row.action, ph2, (e) => {
+            state['cat' + cat][idx].action = e.target.value;
+            autoSave();
+          }));
+          tr.appendChild(td2);
+
+          const td3 = document.createElement('td');
+          td3.appendChild(makeInput(row.resources, 'Какие ресурсы?', (e) => {
+            state['cat' + cat][idx].resources = e.target.value;
+            autoSave();
+          }));
+          tr.appendChild(td3);
+        }
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function addRow(cat) {
+      state['cat' + cat].push(emptyRow(cat));
+      renderTable(cat);
+      autoSave();
+    }
+
+    let state = {
+      cat1: [emptyRow(1), emptyRow(1)],
+      cat2: [emptyRow(2), emptyRow(2)],
+      cat3: [emptyRow(3), emptyRow(3)]
+    };
+
+    function autoSave() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function load() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (saved) {
+          state = saved;
+          if (!state.cat1?.length) state.cat1 = [emptyRow(1)];
+          if (!state.cat2?.length) state.cat2 = [emptyRow(2)];
+          if (!state.cat3?.length) state.cat3 = [emptyRow(3)];
+        }
+      } catch(e) {}
+      renderTable(1);
+      renderTable(2);
+      renderTable(3);
+    }
+
+    function buildMap() {
+      const container = document.getElementById('routesContainer');
+      container.innerHTML = '';
+      let hasNoInAccept = false;
+
+      const routes = [
+        {
+          key: 'cat1',
+          title: 'Могу изменить действием',
+          type: 'action',
+          items: state.cat1.filter(r => r.situation.trim()).map(r => ({
+            text: r.situation.trim(),
+            meta: [r.action, r.resources].filter(Boolean).join(' · ')
+          }))
+        },
+        {
+          key: 'cat2',
+          title: 'Могу повлиять через других',
+          type: 'influence',
+          items: state.cat2.filter(r => r.situation.trim()).map(r => ({
+            text: r.situation.trim(),
+            meta: [r.action, r.resources].filter(Boolean).join(' · ')
+          }))
+        },
+        {
+          key: 'cat3',
+          title: 'Могу только принять',
+          type: 'accept',
+          items: state.cat3.filter(r => r.situation.trim()).map(r => {
+            const isNo = r.solution === 'нет' || r.influence === 'нет';
+            if (isNo) hasNoInAccept = true;
+            return {
+              text: r.situation.trim(),
+              meta: `Решение: ${r.solution || '—'} · Влияние: ${r.influence || '—'}`,
+              isNo
+            };
+          })
+        }
+      ];
+
+      routes.forEach(route => {
+        const block = document.createElement('div');
+        block.className = 'route-block';
+
+        const title = document.createElement('div');
+        title.className = 'route-block-title';
+        title.innerHTML = `<span class="dot ${route.type}"></span> ${route.title}`;
+        block.appendChild(title);
+
+        if (route.items.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'route-empty';
+          empty.textContent = 'Пока нет ситуаций в этой зоне';
+          block.appendChild(empty);
+        } else {
+          const visual = document.createElement('div');
+          visual.className = 'route-visual';
+
+          // SVG curved path
+          const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          svg.setAttribute('class', 'route-svg');
+          svg.setAttribute('viewBox', '0 0 100 100');
+          svg.setAttribute('preserveAspectRatio', 'none');
+
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          // Nice S-curve similar to the reference image
+          path.setAttribute('d', 'M 20 5 C 20 25, 80 25, 80 50 S 20 75, 20 95');
+          svg.appendChild(path);
+          visual.appendChild(svg);
+
+          const nodesWrap = document.createElement('div');
+          nodesWrap.className = 'route-nodes';
+
+          route.items.forEach((item, idx) => {
+            const node = document.createElement('div');
+            node.className = 'route-node';
+
+            const isLast = idx === route.items.length - 1;
+            const pin = document.createElement('div');
+            pin.className = 'node-pin' + (isLast ? ' flag' : '');
+            pin.innerHTML = `<span>${isLast ? '⚑' : (idx + 1)}</span>`;
+
+            const card = document.createElement('div');
+            card.className = 'node-card';
+            card.innerHTML = `
+              <div class="node-text">${item.text}</div>
+              ${item.meta ? `<div class="node-meta">${item.meta}</div>` : ''}
+            `;
+
+            node.appendChild(pin);
+            node.appendChild(card);
+            nodesWrap.appendChild(node);
+          });
+
+          visual.appendChild(nodesWrap);
+          block.appendChild(visual);
+        }
+
+        container.appendChild(block);
+      });
+
+      document.getElementById('noteBox').style.display = hasNoInAccept ? 'block' : 'none';
+      document.getElementById('resultSection').classList.add('show');
+      document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      autoSave();
+      const status = document.getElementById('saveStatus');
+      status.classList.add('show');
+      setTimeout(() => status.classList.remove('show'), 2000);
+    }
+
+    document.getElementById('buildBtn').addEventListener('click', buildMap);
+    load();
+  </script>
+</body>
+</html>

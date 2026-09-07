@@ -40,7 +40,6 @@
       flex-direction: column;
     }
 
-    /* Header */
     header {
       padding: 28px 24px 20px;
       text-align: center;
@@ -59,7 +58,6 @@
       color: var(--lime);
     }
 
-    /* Main */
     main {
       flex: 1;
       max-width: 1100px;
@@ -88,11 +86,12 @@
       font-weight: 600;
     }
 
-    /* Cards */
     .cards {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
     }
 
     .card {
@@ -110,6 +109,7 @@
       align-items: center;
       gap: 18px;
       border: 1px solid rgba(255,255,255,0.4);
+      position: relative;
     }
 
     .card:hover {
@@ -134,6 +134,11 @@
     .card-icon svg {
       width: 44px;
       height: 44px;
+    }
+
+    .card-icon .emoji-icon {
+      font-size: 36px;
+      line-height: 1;
     }
 
     /* === Route icon animation === */
@@ -197,6 +202,15 @@
       transform: scale(0.92);
     }
 
+    /* === Circle pulse === */
+    .card:hover .emoji-icon {
+      animation: pulse-heart 0.8s ease-in-out infinite;
+    }
+    @keyframes pulse-heart {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
     .card h2 {
       font-size: 1.25rem;
       font-weight: 800;
@@ -211,7 +225,23 @@
       font-weight: 500;
     }
 
-    /* Footer */
+    .card-counter {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: #1A3B5C;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: none;
+    }
+
+    .card-counter.visible {
+      display: block;
+    }
+
     footer {
       text-align: center;
       padding: 28px 24px;
@@ -244,7 +274,6 @@
       padding-right: 8px;
     }
 
-    /* Responsive */
     @media (max-width: 800px) {
       .cards {
         grid-template-columns: 1fr;
@@ -292,12 +321,9 @@
       <a href="zones.html" class="card">
         <div class="card-icon">
           <svg class="icon-route" viewBox="0 0 48 48" fill="none">
-            <!-- Start pin -->
             <circle class="pin-start" cx="11" cy="11" r="5.5" fill="#ffffff"/>
             <circle class="pin-start" cx="11" cy="11" r="2.8" fill="#a8ff3e"/>
-            <!-- Curved dashed path -->
             <path class="path-line" d="M14 15.5 C 18 28, 30 20, 35 34" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-dasharray="5 3.5"/>
-            <!-- End flag -->
             <g class="flag-end">
               <line x1="36" y1="32" x2="36" y2="43" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
               <path d="M36 32 L45 35.5 L36 39 Z" fill="#a8ff3e"/>
@@ -323,19 +349,16 @@
       <a href="stools.html" class="card">
         <div class="card-icon">
           <svg class="icon-stools" viewBox="0 0 48 48" fill="none">
-            <!-- Left stool (appears on hover) -->
             <g class="stool-side stool-left">
               <rect x="4" y="18" width="12" height="3.5" rx="1.2" fill="#ffffff"/>
               <rect x="5.5" y="21.5" width="2.2" height="12" rx="1" fill="#a8ff3e"/>
               <rect x="12.3" y="21.5" width="2.2" height="12" rx="1" fill="#a8ff3e"/>
             </g>
-            <!-- Center stool (always visible) -->
             <g class="stool-center">
               <rect x="18" y="16" width="12" height="3.5" rx="1.2" fill="#ffffff"/>
               <rect x="19.5" y="19.5" width="2.2" height="14" rx="1" fill="#a8ff3e"/>
               <rect x="26.3" y="19.5" width="2.2" height="14" rx="1" fill="#a8ff3e"/>
             </g>
-            <!-- Right stool (appears on hover) -->
             <g class="stool-side stool-right">
               <rect x="32" y="18" width="12" height="3.5" rx="1.2" fill="#ffffff"/>
               <rect x="33.5" y="21.5" width="2.2" height="12" rx="1" fill="#a8ff3e"/>
@@ -346,6 +369,16 @@
         <h2>Три табурета</h2>
         <p>Разберись, что действительно твоё, что чужое, а что просто необходимо сейчас</p>
       </a>
+
+      <!-- Карточка 4 — Ресурсный круг -->
+      <a href="circle.html" class="card" id="circle-card">
+        <div class="card-counter" id="circle-counter"></div>
+        <div class="card-icon">
+          <span class="emoji-icon">🤝</span>
+        </div>
+        <h2>Ресурсный круг</h2>
+        <p>Собери свой круг поддержки. Добавляй людей, которые могут помочь, и заполняй их анкеты</p>
+      </a>
     </section>
   </main>
 
@@ -354,5 +387,20 @@
     <div class="made">Сделано с помощью ИИ и любви к порядку, в рамках марафона «Реальная жизнь реальных людей»</div>
     <div class="author">Автор: Анастасия Шулакова 😄</div>
   </footer>
+
+  <script>
+    (function() {
+      try {
+        const data = JSON.parse(localStorage.getItem('resourceCircle') || '{}');
+        const count = (data.members && data.members.length) || 0;
+        if (count > 0) {
+          const el = document.getElementById('circle-counter');
+          const word = count === 1 ? 'человек' : (count < 5 ? 'человека' : 'человек');
+          el.textContent = 'В твоём круге ' + count + ' ' + word;
+          el.classList.add('visible');
+        }
+      } catch (e) {}
+    })();
+  </script>
 </body>
 </html>

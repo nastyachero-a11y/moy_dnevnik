@@ -273,6 +273,9 @@
       pointer-events: none;
       transition: opacity 0.3s ease;
       padding: 16px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
     }
 
     .modal-overlay.open {
@@ -515,6 +518,18 @@
       gap: 10px;
       justify-content: center;
       margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Sticky action bar so buttons stay reachable on mobile */
+    .modal-actions.sticky-actions {
+      position: sticky;
+      bottom: 0;
+      background: linear-gradient(to top, #fff 70%, rgba(255,255,255,0.92));
+      padding: 12px 0 4px;
+      margin-top: 12px;
+      margin-bottom: -4px;
+      z-index: 2;
     }
 
     .btn {
@@ -600,11 +615,27 @@
       }
       .bubble { font-size: 11px; padding: 4px 8px; }
 
+      /* Modal overlay: start from top so content is scrollable with keyboard open */
+      .modal-overlay {
+        align-items: flex-start;
+        padding: 12px 12px 24px;
+      }
+
+      .modal {
+        max-height: calc(100vh - 24px);
+        max-height: calc(100dvh - 24px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 auto;
+        padding: 20px 16px 16px;
+      }
+
       .card-layout {
         flex-direction: column;
         gap: 12px;
-        max-height: 95vh;
-        overflow-y: auto;
+        max-height: none;
+        overflow-y: visible;
+        width: 100%;
       }
 
       .focus-char {
@@ -616,8 +647,13 @@
         height: 84px;
       }
 
-      .modal {
-        max-height: none;
+      .char-thumb {
+        aspect-ratio: 1;
+      }
+
+      .char-thumb img {
+        width: 75%;
+        height: 75%;
       }
     }
   </style>
@@ -647,7 +683,7 @@
     <div class="modal">
       <h2>Кто ты в этом круге?</h2>
       <div class="char-grid" id="selfGrid"></div>
-      <div class="modal-actions">
+      <div class="modal-actions sticky-actions">
         <button class="btn btn-secondary" id="selfCancelBtn" style="display:none;">Отмена</button>
         <button class="btn btn-primary" id="selfSelectBtn" disabled>Выбрать</button>
       </div>
@@ -663,7 +699,7 @@
         <label for="personName">Как зовут этого человека?</label>
         <input type="text" id="personName" placeholder="Имя..." maxlength="30" autocomplete="off">
       </div>
-      <div class="modal-actions">
+      <div class="modal-actions sticky-actions">
         <button class="btn btn-secondary" id="addCancelBtn">Отмена</button>
         <button class="btn btn-primary" id="addConfirmBtn" disabled>Добавить</button>
       </div>
@@ -858,6 +894,9 @@
           selectedAdd = id;
           nameWrap.classList.add('visible');
           checkAddBtn();
+          scrollAddActionsIntoView();
+          // Focus name field so user can type immediately
+          setTimeout(() => personName.focus(), 200);
         });
         addGrid.appendChild(div);
       });
@@ -871,7 +910,26 @@
       addConfirmBtn.disabled = !(selectedAdd && personName.value.trim());
     }
 
+    function scrollAddActionsIntoView() {
+      // On mobile, after keyboard / name field appears, ensure buttons are reachable
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          const actions = addModal.querySelector('.modal-actions');
+          if (actions) {
+            actions.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+          // Also scroll the overlay itself if needed
+          addConfirmBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 150);
+      });
+    }
+
     personName.addEventListener('input', checkAddBtn);
+    personName.addEventListener('focus', () => {
+      scrollAddActionsIntoView();
+      // Extra delay for mobile keyboard animation
+      setTimeout(scrollAddActionsIntoView, 400);
+    });
 
     selfSelectBtn.addEventListener('click', () => {
       if (!selectedSelf) return;
@@ -1347,6 +1405,36 @@
         if (state.centerId) renderMembers();
       }, 150);
     });
+
+    // Keep modals usable when mobile keyboard opens (visualViewport)
+    function fitModalToViewport() {
+      if (!window.visualViewport) return;
+      const h = window.visualViewport.height;
+      document.querySelectorAll('.modal-overlay.open .modal').forEach(el => {
+        el.style.maxHeight = Math.max(200, h - 24) + 'px';
+      });
+    }
+    function clearModalViewportFit() {
+      document.querySelectorAll('.modal').forEach(el => {
+        el.style.maxHeight = '';
+      });
+    }
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', fitModalToViewport);
+      window.visualViewport.addEventListener('scroll', fitModalToViewport);
+    }
+    const observeModalOpen = (overlay) => {
+      const obs = new MutationObserver(() => {
+        if (overlay.classList.contains('open')) {
+          fitModalToViewport();
+          setTimeout(fitModalToViewport, 300);
+        } else {
+          clearModalViewportFit();
+        }
+      });
+      obs.observe(overlay, { attributes: true, attributeFilter: ['class'] });
+    };
+    [selfModal, addModal, cardModal, meModal].forEach(observeModalOpen);
   </script>
 </body>
 </html>

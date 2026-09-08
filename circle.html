@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ресурсный круг — Мой дорогой дневник</title>
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -63,9 +66,20 @@
     .back-btn:hover { background: rgba(255,255,255,0.25); }
 
     .page-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       font-size: 1.05rem;
       font-weight: 800;
       letter-spacing: -0.02em;
+    }
+
+    .page-title img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+      flex-shrink: 0;
     }
 
     .counter-badge {
@@ -99,8 +113,8 @@
     }
 
     .center-char img {
-      width: 110px;
-      height: 110px;
+      width: 100px;
+      height: 130px;
       object-fit: contain;
       filter: drop-shadow(0 8px 16px rgba(0,0,0,0.25));
       transition: transform 0.2s ease;
@@ -140,8 +154,8 @@
     }
 
     .member img {
-      width: 90px;
-      height: 90px;
+      width: 80px;
+      height: 105px;
       object-fit: contain;
       filter: drop-shadow(0 6px 12px rgba(0,0,0,0.2));
       transition: filter 0.2s;
@@ -278,6 +292,41 @@
       color: var(--text);
       transform: translateY(20px) scale(0.97);
       transition: transform 0.3s ease;
+    }
+
+    .modal.modal-me {
+      background: linear-gradient(165deg, #f8fbff 0%, #f0f7ff 40%, #eef9f4 100%);
+      border: 2px solid rgba(30, 79, 214, 0.18);
+      box-shadow: 0 12px 36px rgba(30, 79, 214, 0.12);
+    }
+
+    .modal.modal-me h2 {
+      color: #1e4fd6;
+      position: relative;
+    }
+
+    .modal.modal-me h2::after {
+      content: '';
+      display: block;
+      width: 48px;
+      height: 3px;
+      background: linear-gradient(90deg, #1e4fd6, #2bb673);
+      border-radius: 2px;
+      margin: 10px auto 0;
+    }
+
+    .me-actions {
+      flex-wrap: wrap;
+    }
+
+    #meChangeAvatarBtn {
+      background: #e8f0fe;
+      color: #1e4fd6;
+      border: 1px solid rgba(30, 79, 214, 0.25);
+    }
+
+    #meChangeAvatarBtn:hover {
+      background: #d6e4fc;
     }
 
     .modal-overlay.open .modal {
@@ -460,8 +509,8 @@
 
     @media (max-width: 600px) {
       .stage { height: 420px; }
-      .center-char img { width: 90px; height: 90px; }
-      .member img { width: 70px; height: 70px; }
+      .center-char img { width: 80px; height: 105px; }
+      .member img { width: 64px; height: 84px; }
       .add-btn {
         width: 48px;
         height: 48px;
@@ -479,7 +528,10 @@
 <body>
   <div class="top-bar">
     <a href="index.html" class="back-btn">← Назад</a>
-    <div class="page-title">Ресурсный круг</div>
+    <div class="page-title">
+      <img src="icon-64.png" alt="" width="28" height="28">
+      Ресурсный круг
+    </div>
     <div class="counter-badge" id="counter">В круге 0</div>
   </div>
 
@@ -545,6 +597,26 @@
     </div>
   </div>
 
+  <!-- Modal: my avatar / reflection -->
+  <div class="modal-overlay" id="meModal">
+    <div class="modal modal-me">
+      <h2>Это я</h2>
+      <div class="field-group">
+        <label for="feelField">Что я чувствовал(а), когда просил(а) о помощи?</label>
+        <textarea id="feelField" placeholder="Опиши свои чувства в тот момент..."></textarea>
+      </div>
+      <div class="field-group">
+        <label for="learnField">Что я понял(а) после того, как поддержку принял(а)?</label>
+        <textarea id="learnField" placeholder="Чему научила тебя эта поддержка..."></textarea>
+      </div>
+      <div class="modal-actions me-actions">
+        <button class="btn btn-secondary" id="meChangeAvatarBtn" type="button">Изменить персонажа</button>
+        <button class="btn btn-secondary" id="meCancelBtn">Закрыть</button>
+        <button class="btn btn-primary" id="meSaveBtn">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const CHAR_IDS = [];
     for (let r = 0; r < 3; r++) {
@@ -555,10 +627,16 @@
     // 18 characters available
 
     const STORAGE_KEY = 'resourceCircle';
+    const MY_REFLECTION_KEY = 'myReflection';
 
     let state = {
       centerId: null,
       members: [] // { avatarId, name, help, request, thank }
+    };
+
+    let myReflection = {
+      feel: '',
+      learn: ''
     };
 
     let selectedSelf = null;
@@ -569,6 +647,7 @@
     const selfModal = document.getElementById('selfModal');
     const addModal = document.getElementById('addModal');
     const cardModal = document.getElementById('cardModal');
+    const meModal = document.getElementById('meModal');
     const selfGrid = document.getElementById('selfGrid');
     const addGrid = document.getElementById('addGrid');
     const selfSelectBtn = document.getElementById('selfSelectBtn');
@@ -580,6 +659,8 @@
     const addBtn = document.getElementById('addBtn');
     const stage = document.getElementById('stage');
     const counter = document.getElementById('counter');
+    const feelField = document.getElementById('feelField');
+    const learnField = document.getElementById('learnField');
 
     function gifPath(id, type) {
       return `gifs/${id}_${type}.gif`;
@@ -596,11 +677,23 @@
           }
         }
       } catch (e) {}
+      try {
+        const rawMe = localStorage.getItem(MY_REFLECTION_KEY);
+        if (rawMe) {
+          const data = JSON.parse(rawMe);
+          myReflection.feel = data.feel || '';
+          myReflection.learn = data.learn || '';
+        }
+      } catch (e) {}
     }
 
     function saveState() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       updateCounter();
+    }
+
+    function saveMyReflection() {
+      localStorage.setItem(MY_REFLECTION_KEY, JSON.stringify(myReflection));
     }
 
     function updateCounter() {
@@ -693,15 +786,38 @@
       document.getElementById('selfCancelBtn').style.display = 'none';
     });
 
-    // Allow editing self character by clicking on center
+    // Open personal reflection card on center avatar click
     centerChar.addEventListener('click', () => {
       if (!state.centerId) return;
+      openMeCard();
+    });
+    centerChar.style.cursor = 'pointer';
+    centerChar.title = 'Мой аватар — нажми, чтобы открыть';
+
+    function openMeCard() {
+      feelField.value = myReflection.feel || '';
+      learnField.value = myReflection.learn || '';
+      meModal.classList.add('open');
+    }
+
+    document.getElementById('meSaveBtn').addEventListener('click', () => {
+      myReflection.feel = feelField.value.trim();
+      myReflection.learn = learnField.value.trim();
+      saveMyReflection();
+      meModal.classList.remove('open');
+    });
+
+    document.getElementById('meCancelBtn').addEventListener('click', () => {
+      meModal.classList.remove('open');
+    });
+
+    // Change own character from "Это я" card
+    document.getElementById('meChangeAvatarBtn').addEventListener('click', () => {
+      meModal.classList.remove('open');
       buildSelfGrid(true);
       document.getElementById('selfCancelBtn').style.display = 'inline-flex';
       selfModal.classList.add('open');
     });
-    centerChar.style.cursor = 'pointer';
-    centerChar.title = 'Нажми, чтобы изменить персонажа';
 
     addBtn.addEventListener('click', () => {
       buildAddGrid();
@@ -739,6 +855,7 @@
       el._jumpSetup = true;
       const getImg = () => el.querySelector('img') || centerImg;
       const getId = () => el.dataset.avatarId;
+      let touchActive = false;
 
       const startJump = () => {
         if (el.classList.contains('running')) return;
@@ -747,6 +864,7 @@
         if (i) i.src = gifPath(getId(), 'run');
       };
       const stopJump = () => {
+        if (touchActive) return;
         el.classList.remove('jumping');
         const i = getImg();
         if (i && !el.classList.contains('running')) {
@@ -754,11 +872,31 @@
         }
       };
 
+      // Mouse / trackpad
       el.addEventListener('mouseenter', startJump);
       el.addEventListener('mouseleave', stopJump);
-      el.addEventListener('touchstart', startJump, { passive: true });
-      el.addEventListener('touchend', stopJump);
-      el.addEventListener('touchcancel', stopJump);
+
+      // Touch (mobile)
+      el.addEventListener('touchstart', (e) => {
+        touchActive = true;
+        startJump();
+      }, { passive: true });
+      el.addEventListener('touchend', () => {
+        touchActive = false;
+        stopJump();
+      });
+      el.addEventListener('touchcancel', () => {
+        touchActive = false;
+        stopJump();
+      });
+
+      // Pointer events as unified fallback (helps some browsers)
+      el.addEventListener('pointerenter', (e) => {
+        if (e.pointerType === 'mouse' || e.pointerType === 'pen') startJump();
+      });
+      el.addEventListener('pointerleave', (e) => {
+        if (e.pointerType === 'mouse' || e.pointerType === 'pen') stopJump();
+      });
     }
 
     function getPositions(count) {
@@ -784,8 +922,8 @@
           angle = startAngle + (span * i) / (count - 1);
         }
         // Prefer sides and top, slightly bias
-        const x = cx + Math.cos(angle) * rx - 45;
-        const y = cy + Math.sin(angle) * ry - 45;
+        const x = cx + Math.cos(angle) * rx - 40;
+        const y = cy + Math.sin(angle) * ry - 50;
         positions.push({ x, y });
       }
       return positions;
@@ -931,7 +1069,7 @@
     }
 
     // Close modals on overlay click
-    [selfModal, addModal, cardModal].forEach(modal => {
+    [selfModal, addModal, cardModal, meModal].forEach(modal => {
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
           // Allow closing self only if already have center (editing mode)

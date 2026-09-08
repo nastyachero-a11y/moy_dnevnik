@@ -784,5 +784,53 @@
 
     load();
   </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+  <script src="pdf-export.js"></script>
+
+  <script>
+    (function initEmotionalPdf() {
+      if (!window.DiaryPdf) return;
+      const E = DiaryPdf.escape;
+      function hasData() {
+        const stars = state.stars || {};
+        const filled = Object.values(stars).some(s =>
+          (s.name && s.name.trim() && s.name !== 'Новая звезда') ||
+          (s.irritates && s.irritates.trim()) ||
+          (s.emotion && s.emotion.trim()) ||
+          (s.current && s.current.trim()) ||
+          (s.hypothesis && s.hypothesis.trim())
+        );
+        return filled || !!(state.boundary && state.boundary.trim());
+      }
+      function build() {
+        const stars = state.stars || {};
+        let blocks = '';
+        Object.values(stars).forEach((s, i) => {
+          const name = (s.name && s.name.trim()) ? s.name.trim() : ('Звезда ' + (i+1));
+          blocks += `<div class="pdf-block">
+            <h2>★ ${E(name)}</h2>
+            <p><strong>Что раздражает:</strong> ${E(s.irritates || '—')}</p>
+            <p><strong>Эмоция:</strong> ${E(s.emotion || '—')}</p>
+            <p><strong>Как реагирую сейчас:</strong> ${E(s.current || '—')}</p>
+            <p><strong>Гипотеза / как иначе:</strong> ${E(s.hypothesis || '—')}</p>
+          </div>`;
+        });
+        if (!blocks) blocks = '<p class="pdf-muted">Звёзды ещё не заполнены</p>';
+        const boundary = state.boundary && state.boundary.trim()
+          ? `<h2>Граница / вывод</h2><div class="pdf-block"><p>${E(state.boundary)}</p></div>`
+          : '';
+        return `<h1>Эмоциональная карта</h1><div class="pdf-date">Создано: ${DiaryPdf.dateStamp()}</div>
+          ${blocks}${boundary}`;
+      }
+      DiaryPdf.init({
+        filenamePrefix: 'Emotsionalnaya_karta',
+        hasData,
+        build
+      });
+    })();
+  </script>
+
 </body>
 </html>

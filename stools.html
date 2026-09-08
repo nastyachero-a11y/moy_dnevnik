@@ -718,5 +718,57 @@
     });
     window.addEventListener('resize', () => moveFox(state.last || 'mine'));
   </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+  <script src="pdf-export.js"></script>
+
+  <script>
+    (function initStoolsPdf() {
+      if (!window.DiaryPdf) return;
+      const E = DiaryPdf.escape;
+      const labels = {
+        mine: 'Моё',
+        other: 'Чужое',
+        must: 'Необходимо сейчас',
+        refuse: 'Отказаться',
+        reframe: 'Переформулировать',
+        keep: 'Оставить'
+      };
+      function hasData() {
+        return ['mine','other','must','refuse','reframe','keep'].some(k => state[k] && String(state[k]).trim());
+      }
+      function build() {
+        const q = [
+          ['mine', 'Что из этого действительно моё?'],
+          ['other', 'Что чужое?'],
+          ['must', 'Что просто необходимо сейчас?']
+        ];
+        let blocks = q.map(([k, title]) => {
+          const val = (state[k] && String(state[k]).trim()) || '—';
+          return `<div class="pdf-block"><h2>${E(title)}</h2><p>${E(val)}</p></div>`;
+        }).join('');
+
+        const decisionKeys = ['refuse','reframe','keep'];
+        const filled = decisionKeys.filter(k => state[k] && String(state[k]).trim());
+        let decision = '';
+        if (filled.length) {
+          decision = '<h2>Анализ и вывод</h2>' + filled.map(k =>
+            `<div class="pdf-block"><strong>${E(labels[k])}</strong><p>${E(state[k])}</p></div>`
+          ).join('');
+        }
+        const last = state.last ? `<p>Выбранный табурет: <strong>${E(labels[state.last] || state.last)}</strong></p>` : '';
+        return `<h1>Три табурета</h1><div class="pdf-date">Создано: ${DiaryPdf.dateStamp()}</div>
+          ${last}${blocks}${decision}
+          <p class="pdf-muted">Ты выбрал свой табурет.</p>`;
+      }
+      DiaryPdf.init({
+        filenamePrefix: 'Tri_tabureta',
+        hasData,
+        build
+      });
+    })();
+  </script>
+
 </body>
 </html>

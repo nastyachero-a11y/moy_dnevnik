@@ -1418,5 +1418,63 @@
     };
     [selfModal, addModal, cardModal, meModal].forEach(observeModalOpen);
   </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+  <script src="pdf-export.js"></script>
+
+  <script>
+    (function initCirclePdf() {
+      if (!window.DiaryPdf) return;
+      const E = DiaryPdf.escape;
+      function hasData() {
+        return !!(state.centerId || (state.members && state.members.length) ||
+          (myReflection && (myReflection.feel || myReflection.learn)));
+      }
+      function build() {
+        let html = `<h1>Ресурсный круг</h1><div class="pdf-date">Создано: ${DiaryPdf.dateStamp()}</div>`;
+
+        // Center
+        if (state.centerId) {
+          const src = gifPath(state.centerId, 'blink');
+          html += `<div class="pdf-block pdf-row">
+            <img class="pdf-avatar" src="${src}" alt="Я" crossorigin="anonymous">
+            <div><h2>Это я</h2>
+              <p><strong>Что я чувствовал(а), когда просил(а) о помощи?</strong><br>${E(myReflection.feel || '—')}</p>
+              <p><strong>Что я понял(а) после того, как поддержку принял(а)?</strong><br>${E(myReflection.learn || '—')}</p>
+            </div>
+          </div>`;
+        }
+
+        // Members
+        if (state.members && state.members.length) {
+          html += '<h2>Люди в круге</h2>';
+          state.members.forEach(m => {
+            const src = gifPath(m.avatarId, 'blink');
+            html += `<div class="pdf-block pdf-row">
+              <img class="pdf-avatar" src="${src}" alt="${E(m.name)}" crossorigin="anonymous">
+              <div>
+                <h2>${E(m.name)}</h2>
+                <p><strong>В чём может помочь:</strong> ${E(m.help || '—')}</p>
+                <p><strong>Как я могу попросить:</strong> ${E(m.request || '—')}</p>
+                <p><strong>Как я поблагодарил(а):</strong> ${E(m.thank || '—')}</p>
+              </div>
+            </div>`;
+          });
+        } else {
+          html += '<p class="pdf-muted">В круге пока никого нет</p>';
+        }
+
+        html += '<p class="pdf-muted">Твой круг поддержки растёт. Ты не один(а).</p>';
+        return html;
+      }
+      DiaryPdf.init({
+        filenamePrefix: 'Resursnyy_krug',
+        hasData,
+        build
+      });
+    })();
+  </script>
+
 </body>
 </html>

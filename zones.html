@@ -746,5 +746,60 @@
     document.getElementById('buildBtn').addEventListener('click', buildMap);
     load();
   </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+  <script src="pdf-export.js"></script>
+
+  <script>
+    (function initZonesPdf() {
+      if (!window.DiaryPdf) return;
+      const E = DiaryPdf.escape;
+      function rowFilled(r, cat) {
+        if (!r || !r.situation || !r.situation.trim()) return false;
+        return true;
+      }
+      function hasData() {
+        return [1,2,3].some(c => (state['cat'+c]||[]).some(r => rowFilled(r,c)));
+      }
+      function build() {
+        const titles = {
+          1: 'Могу изменить',
+          2: 'Могу повлиять через других',
+          3: 'Могу принять'
+        };
+        let cols = '';
+        for (let c = 1; c <= 3; c++) {
+          const rows = (state['cat'+c]||[]).filter(r => rowFilled(r,c));
+          let body = '';
+          if (!rows.length) {
+            body = '<p class="pdf-muted">Пока пусто</p>';
+          } else {
+            body = rows.map(r => {
+              if (c === 3) {
+                return `<p><strong>${E(r.situation)}</strong><br>Решение: ${E(r.solution||'—')}<br>Влияние: ${E(r.influence||'—')}</p>`;
+              }
+              return `<p><strong>${E(r.situation)}</strong><br>${E(r.action||'')}${r.resources ? '<br>Ресурсы: '+E(r.resources) : ''}</p>`;
+            }).join('');
+          }
+          cols += `<div class="pdf-block"><div class="pdf-col-title">${titles[c]}</div>${body}</div>`;
+        }
+        // try include visual route if visible
+        const result = document.getElementById('resultSection');
+        let routeNote = '';
+        if (result && result.classList.contains('show')) {
+          routeNote = '<h2>Построенный маршрут</h2><p class="pdf-muted">См. визуализацию на странице (сохранено в данных таблиц выше).</p>';
+        }
+        return `<h1>Карта зон влияния</h1><div class="pdf-date">Создано: ${DiaryPdf.dateStamp()}</div>
+          <div class="pdf-columns">${cols}</div>${routeNote}`;
+      }
+      DiaryPdf.init({
+        filenamePrefix: 'Karta_zon_vliyaniya',
+        hasData,
+        build
+      });
+    })();
+  </script>
+
 </body>
 </html>

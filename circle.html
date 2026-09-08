@@ -103,6 +103,13 @@
       height: 110px;
       object-fit: contain;
       filter: drop-shadow(0 8px 16px rgba(0,0,0,0.25));
+      transition: transform 0.2s ease;
+      pointer-events: none;
+    }
+
+    .center-char:hover img,
+    .center-char.jumping img {
+      transform: scale(1.08);
     }
 
     .center-char .label {
@@ -126,8 +133,9 @@
       transition: transform 0.25s ease;
     }
 
-    .member:hover {
-      transform: scale(1.08);
+    .member:hover,
+    .member.jumping {
+      transform: scale(1.1);
       z-index: 6;
     }
 
@@ -137,6 +145,7 @@
       object-fit: contain;
       filter: drop-shadow(0 6px 12px rgba(0,0,0,0.2));
       transition: filter 0.2s;
+      pointer-events: none;
     }
 
     .member .name {
@@ -721,6 +730,35 @@
     function showCenter() {
       centerImg.src = gifPath(state.centerId, 'blink');
       centerChar.style.display = 'flex';
+      setupJump(centerChar, state.centerId);
+    }
+
+    function setupJump(el, avatarId) {
+      el.dataset.avatarId = avatarId;
+      if (el._jumpSetup) return;
+      el._jumpSetup = true;
+      const getImg = () => el.querySelector('img') || centerImg;
+      const getId = () => el.dataset.avatarId;
+
+      const startJump = () => {
+        if (el.classList.contains('running')) return;
+        el.classList.add('jumping');
+        const i = getImg();
+        if (i) i.src = gifPath(getId(), 'run');
+      };
+      const stopJump = () => {
+        el.classList.remove('jumping');
+        const i = getImg();
+        if (i && !el.classList.contains('running')) {
+          i.src = gifPath(getId(), 'blink');
+        }
+      };
+
+      el.addEventListener('mouseenter', startJump);
+      el.addEventListener('mouseleave', stopJump);
+      el.addEventListener('touchstart', startJump, { passive: true });
+      el.addEventListener('touchend', stopJump);
+      el.addEventListener('touchcancel', stopJump);
     }
 
     function getPositions(count) {
@@ -783,6 +821,8 @@
         el.addEventListener('click', (e) => {
           openCard(i);
         });
+
+        setupJump(el, m.avatarId);
 
         stage.appendChild(el);
 

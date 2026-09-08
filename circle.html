@@ -280,6 +280,81 @@
       pointer-events: auto;
     }
 
+    .card-layout {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      max-width: 920px;
+      width: 100%;
+      position: relative;
+    }
+
+    /* Reserve space for the enlarged character (fixed, out of flow) */
+    .card-layout.with-focus {
+      padding-left: 260px;
+      justify-content: flex-start;
+    }
+
+    @media (max-width: 600px) {
+      .card-layout.with-focus {
+        padding-left: 0;
+        padding-top: 200px;
+        justify-content: center;
+      }
+    }
+
+    .focus-char {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      z-index: 2;
+      pointer-events: none;
+      flex-shrink: 0;
+      /* base size matches member img */
+      width: 80px;
+      transform-origin: top left;
+      will-change: transform, left, top;
+    }
+
+    .focus-char.visible {
+      display: flex;
+    }
+
+    .focus-char img {
+      width: 80px;
+      height: 105px;
+      object-fit: contain;
+      filter: drop-shadow(0 12px 28px rgba(0,0,0,0.35));
+    }
+
+    .focus-char .focus-name {
+      margin-top: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      text-align: center;
+      max-width: 160px;
+      opacity: 0;
+      transition: opacity 0.35s ease 0.2s, transform 0.35s ease;
+      transform-origin: top center;
+    }
+
+    .focus-char.settled .focus-name {
+      opacity: 1;
+      /* counter-scale so text stays readable under scale(3) parent */
+      transform: scale(0.38);
+      font-size: 18px;
+      max-width: 280px;
+      white-space: nowrap;
+    }
+
+    /* When settled next to card — visual scale is applied via JS transform */
+    .focus-char.settled img {
+      filter: drop-shadow(0 16px 32px rgba(0,0,0,0.4));
+    }
+
     .modal {
       background: white;
       border-radius: 16px;
@@ -292,6 +367,8 @@
       color: var(--text);
       transform: translateY(20px) scale(0.97);
       transition: transform 0.3s ease;
+      flex: 1 1 auto;
+      min-width: 0;
     }
 
     .modal.modal-me {
@@ -522,6 +599,26 @@
         gap: 8px;
       }
       .bubble { font-size: 11px; padding: 4px 8px; }
+
+      .card-layout {
+        flex-direction: column;
+        gap: 12px;
+        max-height: 95vh;
+        overflow-y: auto;
+      }
+
+      .focus-char {
+        width: 64px;
+      }
+
+      .focus-char img {
+        width: 64px;
+        height: 84px;
+      }
+
+      .modal {
+        max-height: none;
+      }
     }
   </style>
 </head>
@@ -575,24 +672,30 @@
 
   <!-- Modal: card -->
   <div class="modal-overlay" id="cardModal">
-    <div class="modal">
-      <h2 id="cardTitle">Имя</h2>
-      <div class="field-group">
-        <label for="helpField">В чём может помочь</label>
-        <textarea id="helpField" placeholder="Например: выслушать, дать совет, помочь с делом..."></textarea>
+    <div class="card-layout" id="cardLayout">
+      <div class="focus-char" id="focusChar" aria-hidden="true">
+        <img id="focusImg" src="" alt="">
+        <div class="focus-name" id="focusName"></div>
       </div>
-      <div class="field-group">
-        <label for="requestField">Как я могу попросить</label>
-        <textarea id="requestField" placeholder="Как удобнее обратиться к этому человеку..."></textarea>
-      </div>
-      <div class="field-group hidden" id="thankGroup">
-        <label for="thankField">Как я поблагодарил(а)</label>
-        <textarea id="thankField" placeholder="Как ты выразил(а) благодарность..."></textarea>
-      </div>
-      <div class="modal-actions">
-        <button class="btn btn-danger" id="deleteBtn">Удалить</button>
-        <button class="btn btn-secondary" id="cardCancelBtn">Закрыть</button>
-        <button class="btn btn-primary" id="saveBtn">Сохранить</button>
+      <div class="modal">
+        <h2 id="cardTitle">Имя</h2>
+        <div class="field-group">
+          <label for="helpField">В чём может помочь</label>
+          <textarea id="helpField" placeholder="Например: выслушать, дать совет, помочь с делом..."></textarea>
+        </div>
+        <div class="field-group">
+          <label for="requestField">Как я могу попросить</label>
+          <textarea id="requestField" placeholder="Как удобнее обратиться к этому человеку..."></textarea>
+        </div>
+        <div class="field-group hidden" id="thankGroup">
+          <label for="thankField">Как я поблагодарил(а)</label>
+          <textarea id="thankField" placeholder="Как ты выразил(а) благодарность..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-danger" id="deleteBtn">Удалить</button>
+          <button class="btn btn-secondary" id="cardCancelBtn">Закрыть</button>
+          <button class="btn btn-primary" id="saveBtn">Сохранить</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1008,6 +1111,12 @@
       });
     }
 
+    const focusChar = document.getElementById('focusChar');
+    const focusImg = document.getElementById('focusImg');
+    const focusName = document.getElementById('focusName');
+    let focusReturnRect = null;
+    let focusClosing = false;
+
     function openCard(index) {
       editingIndex = index;
       const m = state.members[index];
@@ -1023,7 +1132,132 @@
         thankGroup.classList.add('hidden');
       }
 
-      cardModal.classList.add('open');
+      // Prepare focus character animation from circle position
+      const memberEl = stage.querySelector(`.member[data-index="${index}"]`);
+      focusClosing = false;
+
+      if (memberEl) {
+        const rect = memberEl.getBoundingClientRect();
+        focusReturnRect = {
+          left: rect.left,
+          top: rect.top,
+          width: rect.width,
+          height: rect.height
+        };
+
+        // Hide original in circle while focused
+        memberEl.style.opacity = '0';
+        memberEl.style.pointerEvents = 'none';
+
+        const isMobile = window.innerWidth <= 600;
+        const baseW = isMobile ? 64 : 80;
+
+        focusImg.src = gifPath(m.avatarId, 'run');
+        focusName.textContent = m.name;
+
+        // Start at member's screen position, natural size
+        focusChar.classList.remove('settled');
+        focusChar.classList.add('visible');
+        focusChar.style.position = 'fixed';
+        focusChar.style.left = rect.left + 'px';
+        focusChar.style.top = rect.top + 'px';
+        focusChar.style.width = baseW + 'px';
+        focusChar.style.transform = 'scale(1)';
+        focusChar.style.transition = 'none';
+        focusChar.style.zIndex = '110';
+
+        const layout = document.getElementById('cardLayout');
+        layout.classList.add('with-focus');
+        cardModal.classList.add('open');
+
+        // Animate toward card: scale x3, move next to modal
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            const layoutRect = layout.getBoundingClientRect();
+            const targetScale = 3;
+            const targetW = baseW * targetScale;
+            const targetH = (isMobile ? 84 : 105) * targetScale;
+            let targetLeft, targetTop;
+
+            if (isMobile) {
+              targetLeft = (window.innerWidth - targetW) / 2;
+              // Sit in the reserved padding-top area above the card
+              targetTop = Math.max(16, layoutRect.top - targetH - 8);
+            } else {
+              // Left reserved strip (padding-left: 260px)
+              targetLeft = layoutRect.left + (260 - targetW) / 2;
+              targetTop = layoutRect.top + Math.max(0, (layoutRect.height - targetH) / 2);
+              if (targetTop < 24) targetTop = 24;
+            }
+
+            focusChar.style.transition =
+              'left 0.55s cubic-bezier(0.22, 1, 0.36, 1), top 0.55s cubic-bezier(0.22, 1, 0.36, 1), transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)';
+            focusChar.style.left = targetLeft + 'px';
+            focusChar.style.top = targetTop + 'px';
+            focusChar.style.transform = `scale(${targetScale})`;
+
+            setTimeout(() => {
+              if (!focusClosing) focusChar.classList.add('settled');
+            }, 520);
+          });
+        });
+      } else {
+        cardModal.classList.add('open');
+      }
+    }
+
+    function closeCard(opts = {}) {
+      const { skipReturn = false, afterClose = null } = opts;
+      if (focusClosing) return;
+      focusClosing = true;
+
+      const memberEl = editingIndex >= 0
+        ? stage.querySelector(`.member[data-index="${editingIndex}"]`)
+        : null;
+
+      const finish = () => {
+        focusChar.classList.remove('visible', 'settled');
+        focusChar.style.transition = 'none';
+        focusChar.style.transform = '';
+        focusChar.style.left = '';
+        focusChar.style.top = '';
+        focusChar.style.position = '';
+        focusChar.style.zIndex = '';
+        focusImg.src = '';
+        document.getElementById('cardLayout').classList.remove('with-focus');
+        cardModal.classList.remove('open');
+        if (memberEl && !skipReturn) {
+          memberEl.style.opacity = '';
+          memberEl.style.pointerEvents = '';
+          // Back to blink
+          const img = memberEl.querySelector('img');
+          const m = state.members[editingIndex];
+          if (img && m) img.src = gifPath(m.avatarId, 'blink');
+        }
+        focusClosing = false;
+        if (typeof afterClose === 'function') afterClose();
+      };
+
+      if (skipReturn || !focusReturnRect || !focusChar.classList.contains('visible')) {
+        finish();
+        return;
+      }
+
+      // Animate back to circle position
+      focusChar.classList.remove('settled');
+      focusChar.style.transition =
+        'left 0.5s cubic-bezier(0.22, 1, 0.36, 1), top 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
+      focusChar.style.left = focusReturnRect.left + 'px';
+      focusChar.style.top = focusReturnRect.top + 'px';
+      focusChar.style.transform = 'scale(1)';
+
+      // Switch to blink near the end of return
+      setTimeout(() => {
+        const m = state.members[editingIndex];
+        if (m) focusImg.src = gifPath(m.avatarId, 'blink');
+      }, 280);
+
+      setTimeout(finish, 520);
     }
 
     document.getElementById('saveBtn').addEventListener('click', () => {
@@ -1033,33 +1267,39 @@
       m.request = document.getElementById('requestField').value.trim();
       m.thank = document.getElementById('thankField').value.trim();
       saveState();
-      cardModal.classList.remove('open');
-      renderMembers();
+      closeCard({
+        afterClose: () => renderMembers()
+      });
     });
 
     document.getElementById('cardCancelBtn').addEventListener('click', () => {
-      cardModal.classList.remove('open');
+      closeCard();
     });
 
     document.getElementById('deleteBtn').addEventListener('click', () => {
       if (editingIndex < 0) return;
       if (!confirm('Удалить этого человека из круга?')) return;
 
-      const el = stage.querySelector(`.member[data-index="${editingIndex}"]`);
-      if (el) {
-        el.classList.add('fading');
-        setTimeout(() => {
-          state.members.splice(editingIndex, 1);
-          saveState();
-          cardModal.classList.remove('open');
-          renderMembers();
-        }, 480);
-      } else {
-        state.members.splice(editingIndex, 1);
-        saveState();
-        cardModal.classList.remove('open');
-        renderMembers();
-      }
+      const idx = editingIndex;
+      closeCard({
+        skipReturn: true,
+        afterClose: () => {
+          const el = stage.querySelector(`.member[data-index="${idx}"]`);
+          if (el) {
+            el.classList.add('fading');
+            el.style.opacity = '';
+            setTimeout(() => {
+              state.members.splice(idx, 1);
+              saveState();
+              renderMembers();
+            }, 480);
+          } else {
+            state.members.splice(idx, 1);
+            saveState();
+            renderMembers();
+          }
+        }
+      });
     });
 
     function escapeHtml(str) {
@@ -1074,6 +1314,10 @@
         if (e.target === modal) {
           // Allow closing self only if already have center (editing mode)
           if (modal === selfModal && !state.centerId) return;
+          if (modal === cardModal) {
+            closeCard();
+            return;
+          }
           modal.classList.remove('open');
           if (modal === selfModal) {
             document.getElementById('selfCancelBtn').style.display = 'none';

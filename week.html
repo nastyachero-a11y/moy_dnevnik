@@ -322,30 +322,41 @@
       max-width: 100%;
       overflow-x: auto;
       overflow-y: hidden;
-      padding: 6px 4px 20px;
+      padding: 6px 4px 8px;
+      margin-bottom: 8px;
       scroll-snap-type: x mandatory;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior-x: contain;
-      scrollbar-width: auto; /* Firefox */
-      scrollbar-color: rgba(255,255,255,0.45) rgba(255,255,255,0.12);
+      /* Firefox: максимально заметная полоса */
+      scrollbar-width: auto;
+      scrollbar-color: #ffffff rgba(255,255,255,0.22);
     }
+    /* Chrome / Edge / Safari — полоска ~в 3 раза толще (было 6px) */
     .week-feed-list::-webkit-scrollbar {
-      height: 12px; /* в 2 раза шире/выше полоска */
+      height: 18px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255,255,255,0.18);
+      border-radius: 99px;
     }
     .week-feed-list::-webkit-scrollbar-track {
-      background: rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.2);
       border-radius: 99px;
+      margin: 0 4px;
     }
     .week-feed-list::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.45);
+      background: #ffffff;
       border-radius: 99px;
-      border: 2px solid transparent;
-      background-clip: padding-box;
+      border: 3px solid rgba(30, 79, 214, 0.25);
+      min-width: 48px;
     }
     .week-feed-list::-webkit-scrollbar-thumb:hover {
-      background: rgba(255,255,255,0.6);
-      border: 2px solid transparent;
-      background-clip: padding-box;
+      background: #f0f4ff;
+    }
+    .week-feed-list::-webkit-scrollbar-button {
+      display: none;
+      width: 0;
+      height: 0;
     }
     .feed-card {
       background: rgba(255,255,255,0.96);

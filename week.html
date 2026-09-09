@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Маршрут недели — Мой дорогой дневник</title>
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #1A3B5C;
+      --blue-accent: #1e4fd6;
+      --sand: #E8D9C5;
+      --lime: #a8ff3e;
+      --green: #2bb673;
+      --text: #1a1a2e;
+      --text-soft: #5a6280;
+      --white: #ffffff;
+      --radius: 16px;
+      --shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(165deg, #1a3a9c 0%, #1e6fd9 35%, #2bb673 75%, #3dd68c 100%);
+      background-attachment: fixed;
+      color: var(--white);
+      min-height: 100vh;
+      line-height: 1.45;
+      overflow-x: hidden;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 20;
+    }
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: white;
+      padding: 9px 14px;
+      border-radius: 11px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.25); }
+
+    .page-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .counter-badge {
+      background: rgba(255,255,255,0.2);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    /* ========== LAYOUT + WEEK RAIL ========== */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 92px;
+      gap: 10px;
+      max-width: 1100px;
+      margin: 0 auto 30px;
+      padding: 0 12px;
+      align-items: start;
+    }
+    .weeks-rail {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding-top: 20px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+    .weeks-rail-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.9;
+      margin-bottom: 2px;
+    }
+    .week-dot {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.4);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.95rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      line-height: 1.1;
+      text-align: center;
+      flex-shrink: 0;
+      padding: 5px 4px;
+      box-sizing: border-box;
+    }
+    .week-dot .wd-num {
+      font-size: 0.9rem;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+    .week-dot .wd-fill {
+      font-size: 0.52rem;
+      font-weight: 600;
+      opacity: 0.95;
+      line-height: 1.15;
+      max-width: 58px;
+      letter-spacing: -0.02em;
+    }
+    .week-dot:hover {
+      background: rgba(255,255,255,0.32);
+      transform: scale(1.06);
+    }
+    .week-dot.current {
+      background: rgba(255,255,255,0.95);
+      color: #1A3B5C;
+      border-color: #fff;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    }
+    .week-dot.has-data {
+      border-color: #a8ff3e;
+      box-shadow: 0 0 0 2px rgba(168,255,62,0.3);
+    }
+    .week-nav-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .week-nav-row button {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.22);
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .week-nav-row button:hover { background: rgba(255,255,255,0.38); }
+
+    /* ========== ROAD STAGE ========== */
+    .road-stage {
+      position: relative;
+      width: 100%;
+      margin: 10px 0 30px;
+      padding: 20px 16px 40px;
+      min-height: 420px;
+    }
+
+    .road-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 8px 20px rgba(0,0,0,0.18));
+    }
+
+    .stations {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .station {
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      margin-left: -32px;
+      margin-top: -32px;
+      pointer-events: auto;
+      cursor: pointer;
+      z-index: 5;
+      transition: transform 0.25s ease;
+    }
+    .station:hover { transform: scale(1.12); }
+    .station.active { transform: scale(1.15); }
+
+    .station-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.92);
+      border: 3px solid #fff;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.78rem;
+      color: var(--blue-accent);
+      margin: 0 auto;
+      transition: background 0.3s, border-color 0.3s, color 0.3s;
+    }
+
+    .station.done .station-circle {
+      background: linear-gradient(135deg, #2bb673, #a8ff3e);
+      border-color: #fff;
+      color: #0d3d24;
+      font-size: 1.15rem;
+    }
+
+    .station-label {
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-top: 4px;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.35);
+      white-space: nowrap;
+    }
+
+    .station-avatars {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: -8px;
+      margin-bottom: 4px;
+    }
+
+    .station-avatars img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      margin-left: -6px;
+    }
+    .station-avatars img:first-child { margin-left: 0; }
+
+    /* Traveler (user avatar) */
+    .traveler {
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      margin-left: -45px;
+      margin-top: -70px;
+      z-index: 10;
+      pointer-events: none;
+      transition: left 0.05s linear, top 0.05s linear;
+    }
+
+    .traveler img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
+    }
+
+    .traveler.running img {
+      /* slight bounce feel via CSS if needed */
+    }
+
+    .hint {
+      text-align: center;
+      font-size: 0.95rem;
+      font-weight: 600;
+      opacity: 0.9;
+      margin: 0 20px 16px;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.25);
+    }
+
+    /* ========== DAY PANEL ========== */
+    .day-panel {
+      display: none;
+      max-width: 560px;
+      margin: 0 auto 40px;
+      background: rgba(255,255,255,0.97);
+      border-radius: 20px;
+      padding: 24px 22px 20px;
+      color: var(--text);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+      animation: panelIn 0.35s ease;
+    }
+    .day-panel.open { display: block; }
+
+    @keyframes panelIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .day-panel h2 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--blue-accent);
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    .field-group {
+      margin-bottom: 16px;
+    }
+    .field-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-soft);
+      margin-bottom: 6px;
+    }
+    .field-group textarea,
+    .field-group input[type="text"] {
+      width: 100%;
+      border: 2px solid #e4eaf5;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      resize: vertical;
+      min-height: 72px;
+      transition: border-color 0.2s;
+      color: var(--text);
+    }
+    .field-group textarea:focus,
+    .field-group input:focus {
+      outline: none;
+      border-color: var(--blue-accent);
+    }
+
+    /* Photos */
+    .photos-area {
+      margin-bottom: 16px;
+    }
+    .photos-fan {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+      min-height: 20px;
+    }
+    .photo-thumb {
+      width: 88px;
+      height: 88px;
+      border-radius: 12px;
+      object-fit: cover;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      transition: transform 0.2s;
+      border: 2px solid #fff;
+    }
+    .photo-thumb:hover { transform: scale(1.06); }
+
+    .photo-add-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #f0f4ff;
+      border: 2px dashed #b8c8f0;
+      color: var(--blue-accent);
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .photo-add-btn:hover { background: #e4ecff; }
+
+    /* Large companions next to day card (like resource circle) */
+    .companions-stage {
+      display: none;
+      max-width: 560px;
+      margin: 0 auto 16px;
+      padding: 8px 8px 0;
+      flex-wrap: wrap;
+      gap: 18px 24px;
+      justify-content: center;
+      align-items: flex-end;
+      min-height: 0;
+    }
+    .companions-stage.visible {
+      display: flex;
+    }
+    .companion {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .companion img {
+      width: 100px;
+      height: 130px;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.25));
+      pointer-events: none;
+      transition: transform 0.2s ease;
+    }
+    .companion:hover img,
+    .companion.jumping img {
+      transform: scale(1.08);
+    }
+    .companion .comp-name {
+      margin-top: 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: rgba(255,255,255,0.92);
+      color: var(--blue);
+      padding: 3px 10px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      max-width: 120px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .companion .speech-bubble {
+      position: absolute;
+      bottom: calc(100% - 8px);
+      left: 50%;
+      transform: translateX(-50%) translateY(6px) scale(0.92);
+      background: #fff;
+      color: var(--text);
+      font-size: 0.72rem;
+      font-weight: 600;
+      line-height: 1.3;
+      padding: 10px 12px;
+      border-radius: 14px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+      width: 170px;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+      z-index: 8;
+    }
+    .companion .speech-bubble::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 8px solid transparent;
+      border-top-color: #fff;
+    }
+    .companion:hover .speech-bubble,
+    .companion.jumping .speech-bubble {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    /* People from circle */
+    .people-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+      align-items: center;
+    }
+    .person-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #f0f7ff;
+      border: 2px solid #d0e0ff;
+      border-radius: 20px;
+      padding: 4px 10px 4px 4px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--blue);
+      cursor: default;
+    }
+    .person-chip img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+    .person-chip .remove {
+      margin-left: 2px;
+      cursor: pointer;
+      opacity: 0.6;
+      font-size: 1rem;
+      line-height: 1;
+    }
+    .person-chip .remove:hover { opacity: 1; color: #c0392b; }
+
+    .add-person-btn {
+      background: #e8f8ef;
+      border: 2px dashed #8fd4a8;
+      color: #1a7a4c;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .add-person-btn:hover { background: #d4f0e0; }
+
+    .panel-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 11px 20px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary {
+      background: linear-gradient(135deg, #1e4fd6, #2bb673);
+      color: white;
+      box-shadow: 0 4px 14px rgba(30,79,214,0.3);
+    }
+    .btn-secondary {
+      background: #f0f0f5;
+      color: var(--text-soft);
+    }
+    .btn-danger {
+      background: #ffe8e8;
+      color: #c0392b;
+    }
+
+    /* ========== MODALS ========== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: white;
+      border-radius: 20px;
+      padding: 24px;
+      max-width: 440px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      color: var(--text);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    }
+    .modal h2 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+      text-align: center;
+      color: var(--blue-accent);
+    }
+
+    .char-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .char-thumb {
+      aspect-ratio: 1;
+      border-radius: 14px;
+      background: #f5f7fc;
+      border: 3px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.15s;
+      overflow: hidden;
+    }
+    .char-thumb img {
+      width: 85%;
+      height: 85%;
+      object-fit: contain;
+    }
+    .char-thumb:hover { transform: scale(1.04); }
+    .char-thumb.selected {
+      border-color: var(--blue-accent);
+      background: #e8f0fe;
+    }
+
+    .name-input-wrap {
+      margin-bottom: 14px;
+      display: none;
+    }
+    .name-input-wrap.visible { display: block; }
+    .name-input-wrap label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-soft);
+      margin-bottom: 6px;
+    }
+    .name-input-wrap input {
+      width: 100%;
+      border: 2px solid #e4eaf5;
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    /* Lightbox */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img.main {
+      max-width: min(90vw, 520px);
+      max-height: 60vh;
+      border-radius: 12px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+      object-fit: contain;
+    }
+    .lightbox-avatar {
+      width: 100px;
+      height: 100px;
+      filter: drop-shadow(0 6px 16px rgba(0,0,0,0.4));
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 18px;
+      right: 22px;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      font-size: 1.6rem;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .no-avatar-msg {
+      text-align: center;
+      padding: 40px 20px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 16px;
+      margin: 30px auto;
+      max-width: 420px;
+    }
+    .no-avatar-msg a {
+      color: var(--lime);
+      font-weight: 700;
+    }
+
+    @media (max-width: 640px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .station { width: 52px; height: 52px; margin-left: -26px; margin-top: -26px; }
+      .station-circle { width: 46px; height: 46px; font-size: 0.68rem; }
+      .traveler { width: 72px; height: 72px; margin-left: -36px; margin-top: -56px; }
+      .companion img { width: 80px; height: 105px; }
+      .companion .speech-bubble { width: 150px; font-size: 0.68rem; }
+      .road-stage { min-height: 520px; padding-bottom: 20px; }
+      .weeks-rail {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding-top: 4px;
+        padding-bottom: 12px;
+        order: 2;
+      }
+      .weeks-rail-title { width: 100%; text-align: center; }
+      .week-dot { width: 56px; height: 56px; font-size: 0.72rem; }
+      .week-dot .wd-fill { font-size: 0.48rem; max-width: 52px; }
+      .week-nav-row { order: -1; width: 100%; justify-content: center; margin-bottom: 6px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a href="index.html" class="back-btn">← Назад</a>
+    <div class="page-title">Маршрут недели</div>
+    <div class="counter-badge" id="filledBadge">0 / 7 дней</div>
+  </div>
+
+  <p class="hint" id="hint">Выбери день — твой персонаж отправится в путь</p>
+
+  <div class="main-layout">
+  <div class="road-stage" id="roadStage">
+    <!-- SVG road (path updated dynamically for desktop diagonal / mobile vertical) -->
+    <svg class="road-svg" viewBox="0 0 1000 380" preserveAspectRatio="xMidYMid meet">
+      <!-- soft ground -->
+      <path d="M0 280 Q250 220 500 260 T1000 240 L1000 380 L0 380 Z" fill="rgba(255,255,255,0.08)"/>
+      <!-- main road path (stroke for visual) -->
+      <path id="roadPath" d="M 60 300 
+        C 140 280, 180 200, 260 180
+        S 380 160, 460 200
+        S 580 280, 660 250
+        S 780 160, 860 180
+        S 940 220, 960 210"
+        fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="28" stroke-linecap="round"/>
+      <path d="M 60 300 
+        C 140 280, 180 200, 260 180
+        S 380 160, 460 200
+        S 580 280, 660 250
+        S 780 160, 860 180
+        S 940 220, 960 210"
+        fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="14" stroke-linecap="round" stroke-dasharray="12 10"/>
+    </svg>
+
+    <div class="stations" id="stations"></div>
+    <div class="traveler" id="traveler" style="display:none;">
+      <img id="travelerImg" src="" alt="Я">
+    </div>
+  </div>
+
+  <aside class="weeks-rail" id="weeksRail">
+    <div class="weeks-rail-title">Недели</div>
+    <div class="week-nav-row">
+      <button type="button" id="prevWeekBtn" aria-label="Предыдущая">←</button>
+      <button type="button" id="nextWeekBtn" aria-label="Следующая">→</button>
+    </div>
+  </aside>
+  </div>
+
+  <div class="no-avatar-msg" id="noAvatarMsg" style="display:none;">
+    Сначала выбери своего персонажа в<br>
+    <a href="circle.html">Ресурсном круге</a>
+  </div>
+
+  <!-- Large companions (appear when people added to day) -->
+  <div class="companions-stage" id="companionsStage"></div>
+
+  <!-- Day editing panel -->
+  <div class="day-panel" id="dayPanel">
+    <h2 id="dayTitle">Понедельник</h2>
+
+    <div class="field-group">
+      <label for="dayDateField">Дата этого дня</label>
+      <input type="date" id="dayDateField" style="width:100%;padding:10px 12px;border:2px solid #e0e6f0;border-radius:10px;font-family:inherit;font-size:0.95rem;font-weight:600;color:var(--text);outline:none;">
+    </div>
+
+    <div class="field-group">
+      <label for="goodField">Что хорошего случилось сегодня?</label>
+      <textarea id="goodField" placeholder="Напиши, что порадовало или вдохновило..."></textarea>
+    </div>
+
+    <div class="field-group">
+      <label for="selfField">Что приятного я сделал(а) для себя?</label>
+      <textarea id="selfField" placeholder="Маленькая радость, забота о себе..."></textarea>
+    </div>
+
+    <div class="photos-area">
+      <label style="font-size:0.82rem;font-weight:700;color:var(--text-soft);">Моя закладка дня</label>
+      <div class="photos-fan" id="photosFan"></div>
+      <button type="button" class="photo-add-btn" id="photoAddBtn">＋ Загрузить фото</button>
+      <input type="file" id="photoInput" accept="image/*" multiple style="display:none;">
+    </div>
+
+    <div class="field-group">
+      <label>Кто был рядом (из Ресурсного круга)</label>
+      <div class="people-row" id="peopleRow">
+        <button type="button" class="add-person-btn" id="addPersonBtn">＋ Добавить</button>
+      </div>
+    </div>
+
+    <div class="panel-actions">
+      <button class="btn btn-secondary" id="dayCloseBtn">Закрыть</button>
+      <button class="btn btn-primary" id="daySaveBtn">Сохранить</button>
+    </div>
+  </div>
+
+  <!-- Modal: pick / add person from circle -->
+  <div class="modal-overlay" id="personModal">
+    <div class="modal">
+      <h2>Кто участвовал в этом дне?</h2>
+      <div id="existingPeople" style="margin-bottom:14px;"></div>
+      <p style="font-size:0.85rem;color:var(--text-soft);margin-bottom:10px;font-weight:600;">Или выбери нового персонажа:</p>
+      <div class="char-grid" id="personGrid"></div>
+      <div class="name-input-wrap" id="personNameWrap">
+        <label for="personName">Как зовут?</label>
+        <input type="text" id="personName" placeholder="Имя..." maxlength="30">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="personCancelBtn">Отмена</button>
+        <button class="btn btn-primary" id="personConfirmBtn" disabled>Добавить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose">×</button>
+    <img class="main" id="lightboxImg" src="" alt="">
+    <img class="lightbox-avatar" id="lightboxAvatar" src="" alt="">
+  </div>
+
+  <script>
+    const DAYS = [
+      { key: 'mon', label: 'ПН', full: 'Понедельник' },
+      { key: 'tue', label: 'ВТ', full: 'Вторник' },
+      { key: 'wed', label: 'СР', full: 'Среда' },
+      { key: 'thu', label: 'ЧТ', full: 'Четверг' },
+      { key: 'fri', label: 'ПТ', full: 'Пятница' },
+      { key: 'sat', label: 'СБ', full: 'Суббота' },
+      { key: 'sun', label: 'ВС', full: 'Воскресенье' }
+    ];
+
+    // Positions along a curved route (like zones map S-curve)
+    // Desktop: overall top-left → bottom-right with horizontal wiggle
+    // Mobile:  top → bottom with left-right wiggle
+    function getStationPositions() {
+      const mobile = window.innerWidth <= 640;
+      const n = 7;
+      const pts = [];
+      for (let i = 0; i < n; i++) {
+        const t = i / (n - 1); // 0..1
+        if (mobile) {
+          // vertical progression, alternate left/right (S-curve feel)
+          const x = (i % 2 === 0) ? 0.32 : 0.68;
+          const y = 0.08 + t * 0.86;
+          pts.push({ x, y });
+        } else {
+          // diagonal top-left → bottom-right with vertical wiggle
+          const x = 0.08 + t * 0.84;
+          // gentle wave: up/down around the diagonal
+          const wave = Math.sin(t * Math.PI * 2.2) * 0.10;
+          const y = 0.14 + t * 0.72 + wave;
+          pts.push({ x: Math.min(0.94, Math.max(0.06, x)), y: Math.min(0.92, Math.max(0.08, y)) });
+        }
+      }
+      return pts;
+    }
+    let STATION_POS = getStationPositions();
+
+    const CIRCLE_KEY = 'resourceCircle';
+    const WEEK_KEY = 'weekRoute';
+
+    const CHAR_IDS = [];
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c < 6; c++) {
+        CHAR_IDS.push(`char_${r}_${c}`);
+      }
+    }
+
+    function gifPath(id, type) {
+      return `gifs/${id}_${type}.gif`;
+    }
+
+    // ---- State ----
+    let centerId = null;
+    let circleMembers = []; // from resourceCircle
+    let weekData = {};      // { mon: { good, selfCare, photos: [], people: [{avatarId,name}] }, ... }
+    let currentDay = null;
+    let selectedNewAvatar = null;
+    let isMoving = false;
+
+    // ---- DOM ----
+    const roadStage = document.getElementById('roadStage');
+    const stationsEl = document.getElementById('stations');
+    const traveler = document.getElementById('traveler');
+    const travelerImg = document.getElementById('travelerImg');
+    const dayPanel = document.getElementById('dayPanel');
+    const filledBadge = document.getElementById('filledBadge');
+    const noAvatarMsg = document.getElementById('noAvatarMsg');
+    const hint = document.getElementById('hint');
+
+    // ---- Load ----
+    function loadCircle() {
+      try {
+        const raw = localStorage.getItem(CIRCLE_KEY);
+        if (raw) {
+          const data = JSON.parse(raw);
+          centerId = data.centerId || null;
+          circleMembers = data.members || [];
+        }
+      } catch (e) {}
+    }
+
+    let currentWeek = 0;
+    const TOTAL_WEEKS = 12;
+    let allWeeks = {}; // { "0": { mon: {...}, ... }, ... }
+
+    function loadWeek() {
+      try {
+        const raw = localStorage.getItem(WEEK_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        // migrate old flat format (had mon/tue keys at top level)
+        if (data.mon || data.tue || data.wed) {
+          allWeeks = { "0": data };
+          currentWeek = 0;
+        } else {
+          allWeeks = data.weeks || {};
+          currentWeek = data.currentWeek || 0;
+        }
+        weekData = allWeeks[String(currentWeek)] || {};
+      } catch (e) {}
+    }
+
+    function saveWeek() {
+      allWeeks[String(currentWeek)] = weekData;
+      localStorage.setItem(WEEK_KEY, JSON.stringify({ currentWeek, weeks: allWeeks }));
+      updateBadge();
+      renderStations();
+      renderWeekRail();
+    }
+
+    function switchWeek(w) {
+      // persist current
+      allWeeks[String(currentWeek)] = weekData;
+      currentWeek = w;
+      weekData = allWeeks[String(currentWeek)] || {};
+      allWeeks[String(currentWeek)] = weekData;
+      localStorage.setItem(WEEK_KEY, JSON.stringify({ currentWeek, weeks: allWeeks }));
+      currentDay = null;
+      dayPanel.classList.remove('open');
+      lastStationIdx = 0;
+      placeTravelerAt(0);
+      updateBadge();
+      renderStations();
+      renderWeekRail();
+      const titleEl = document.querySelector('.page-title');
+      if (titleEl) titleEl.textContent = 'Маршрут недели · ' + (currentWeek + 1);
+    }
+
+    function formatDM(iso) {
+      if (!iso) return '';
+      const p = iso.split('-');
+      if (p.length !== 3) return iso;
+      return p[2] + '.' + p[1];
+    }
+
+    function addDaysISO(iso, days) {
+      const d = new Date(iso + 'T12:00:00');
+      if (isNaN(d.getTime())) return null;
+      d.setDate(d.getDate() + days);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + day;
+    }
+
+    /** Range label for week circle: "07.09-13.09" from Monday date or any known day */
+    function weekDateRangeLabel(wd) {
+      if (!wd) return '';
+      // Prefer Monday
+      let startIso = (wd.mon && wd.mon.date) ? wd.mon.date : null;
+      if (!startIso) {
+        // Infer from any day that has a date: map day key → offset from Monday
+        const offsets = { mon: 0, tue: 1, wed: 2, thu: 3, fri: 4, sat: 5, sun: 6 };
+        for (const d of DAYS) {
+          const day = wd[d.key];
+          if (day && day.date) {
+            startIso = addDaysISO(day.date, -offsets[d.key]);
+            break;
+          }
+        }
+      }
+      if (!startIso) return '';
+      const endIso = addDaysISO(startIso, 6);
+      if (!endIso) return formatDM(startIso);
+      return formatDM(startIso) + '-' + formatDM(endIso);
+    }
+
+    function renderWeekRail() {
+      const rail = document.getElementById('weeksRail');
+      if (!rail) return;
+      const dots = rail.querySelectorAll('.week-dot');
+      dots.forEach(d => d.remove());
+      const nav = rail.querySelector('.week-nav-row');
+      for (let w = 0; w < TOTAL_WEEKS; w++) {
+        const wd = allWeeks[String(w)] || {};
+        const filled = DAYS.filter(d => {
+          const day = wd[d.key];
+          return day && (day.date || day.good || day.selfCare || (day.photos && day.photos.length) || (day.people && day.people.length));
+        }).length;
+        const range = weekDateRangeLabel(wd);
+        const el = document.createElement('div');
+        el.className = 'week-dot' + (w === currentWeek ? ' current' : '') + (filled > 0 ? ' has-data' : '');
+        const sub = range || (filled ? filled + '/7' : '—');
+        el.innerHTML = '<span class="wd-num">' + (w + 1) + '</span><span class="wd-fill">' + sub + '</span>';
+        el.title = range ? ('Неделя ' + (w + 1) + ': ' + range) : ('Неделя ' + (w + 1));
+        el.addEventListener('click', () => switchWeek(w));
+        if (nav) rail.insertBefore(el, nav);
+        else rail.appendChild(el);
+      }
+    }
+
+    function updateBadge() {
+      const n = DAYS.filter(d => {
+        const day = weekData[d.key];
+        return day && (day.date || day.good || day.selfCare || (day.photos && day.photos.length) || (day.people && day.people.length));
+      }).length;
+      filledBadge.textContent = `${n} / 7 дней`;
+    }
+
+    // ---- Road path (responsive curved, like zones map) ----
+    function buildCurvePath(pts, W, H) {
+      // pts are 0..1; convert to viewBox coords
+      const p = pts.map(pt => ({ x: pt.x * W, y: pt.y * H }));
+      if (p.length < 2) return '';
+      let d = `M ${p[0].x.toFixed(1)} ${p[0].y.toFixed(1)}`;
+      for (let i = 0; i < p.length - 1; i++) {
+        const a = p[i];
+        const b = p[i + 1];
+        // control points for smooth S-like curve between stations
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const c1x = a.x + dx * 0.4;
+        const c1y = a.y + dy * 0.05;
+        const c2x = a.x + dx * 0.6;
+        const c2y = b.y - dy * 0.05;
+        d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+      }
+      return d;
+    }
+
+    function updateRoadPath() {
+      const svg = document.querySelector('.road-svg');
+      if (!svg) return;
+      const mobile = window.innerWidth <= 640;
+      const W = 1000, H = mobile ? 520 : 380;
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      roadStage.style.minHeight = mobile ? '560px' : '420px';
+
+      STATION_POS = getStationPositions();
+      const d = buildCurvePath(STATION_POS, W, H);
+      const paths = svg.querySelectorAll('path');
+      // path[0] soft ground — simple area under path
+      if (paths[0]) {
+        const ground = mobile
+          ? `M0 ${H} L0 0 L${W} 0 L${W} ${H} Z`
+          : `M0 ${H} L0 ${H*0.55} Q ${W*0.5} ${H*0.2} ${W} ${H*0.7} L${W} ${H} Z`;
+        // keep subtle ground
+        paths[0].setAttribute('d', `M0 ${H*0.75} Q ${W*0.3} ${H*0.5} ${W*0.6} ${H*0.65} T ${W} ${H*0.55} L${W} ${H} L0 ${H} Z`);
+      }
+      if (paths[1]) paths[1].setAttribute('d', d);
+      if (paths[2]) paths[2].setAttribute('d', d);
+    }
+
+    // ---- Stations ----
+    function renderStations() {
+      STATION_POS = getStationPositions();
+
+      stationsEl.innerHTML = '';
+      const w = roadStage.clientWidth;
+      const h = roadStage.clientHeight || 420;
+
+      DAYS.forEach((d, i) => {
+        const pos = STATION_POS[i];
+        const el = document.createElement('div');
+        el.className = 'station';
+        el.dataset.day = d.key;
+        el.style.left = (pos.x * 100) + '%';
+        el.style.top = (pos.y * 100) + '%';
+
+        const day = weekData[d.key];
+        const isDone = day && (day.date || day.good || day.selfCare || (day.photos && day.photos.length) || (day.people && day.people.length));
+        if (isDone) el.classList.add('done');
+
+        let avatarsHtml = '';
+        if (day && day.people && day.people.length) {
+          avatarsHtml = '<div class="station-avatars">' +
+            day.people.slice(0, 3).map(p => `<img src="${gifPath(p.avatarId, 'blink')}" alt="">`).join('') +
+            '</div>';
+        }
+
+        const dateStr = (day && day.date) ? (() => { const p = day.date.split('-'); return p.length===3 ? p[2]+'.'+p[1] : day.date; })() : '';
+        el.innerHTML = `
+          ${avatarsHtml}
+          <div class="station-circle">${isDone ? '✓' : d.label}</div>
+          <div class="station-label">${d.full}${dateStr ? '<br><span style="opacity:0.85;font-size:0.65rem">'+dateStr+'</span>' : ''}</div>
+        `;
+
+        el.addEventListener('click', () => {
+          if (!centerId) return;
+          goToDay(i);
+        });
+
+        stationsEl.appendChild(el);
+      });
+    }
+
+    // ---- Traveler movement ----
+    function placeTravelerAt(index) {
+      const pos = STATION_POS[index];
+      traveler.style.left = (pos.x * 100) + '%';
+      traveler.style.top = (pos.y * 100) + '%';
+      traveler.style.display = 'block';
+      travelerImg.src = gifPath(centerId, 'blink');
+    }
+
+    let moveToken = 0;
+    function animateTraveler(fromIdx, toIdx, durationMs, onDone) {
+      const token = ++moveToken;
+      isMoving = true;
+      travelerImg.src = gifPath(centerId, 'run');
+      traveler.classList.add('running');
+
+      const start = performance.now();
+      const from = STATION_POS[fromIdx];
+      const to = STATION_POS[toIdx];
+
+      // Simple ease + slight arc for "road" feel
+      function frame(now) {
+        const t = Math.min(1, (now - start) / durationMs);
+        const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+        const x = from.x + (to.x - from.x) * ease;
+        // slight vertical bounce/arc
+        const yBase = from.y + (to.y - from.y) * ease;
+        const arc = Math.sin(ease * Math.PI) * -0.06;
+        const y = yBase + arc;
+
+        traveler.style.left = (x * 100) + '%';
+        traveler.style.top = (y * 100) + '%';
+
+        if (token !== moveToken) return; // interrupted by newer move
+        if (t < 1) {
+          requestAnimationFrame(frame);
+        } else {
+          travelerImg.src = gifPath(centerId, 'blink');
+          traveler.classList.remove('running');
+          isMoving = false;
+          if (onDone) onDone();
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+
+    let lastStationIdx = 0;
+
+    function goToDay(idx) {
+      const d = DAYS[idx];
+      currentDay = d.key;
+
+      // Highlight
+      document.querySelectorAll('.station').forEach(s => s.classList.remove('active'));
+      const st = document.querySelector(`.station[data-day="${d.key}"]`);
+      if (st) st.classList.add('active');
+
+      // Open card immediately — can edit while character walks
+      openDayPanel(d);
+
+      const from = lastStationIdx;
+      lastStationIdx = idx;
+
+      if (from === idx) return;
+
+      // Animate in background (don't block editing)
+      animateTraveler(from, idx, 4000, null);
+    }
+
+    // ---- Day panel ----
+    function openDayPanel(d) {
+      document.getElementById('dayTitle').textContent = d.full;
+      const data = weekData[d.key] || { good: '', selfCare: '', photos: [], people: [] };
+
+      document.getElementById('dayDateField').value = data.date || '';
+      document.getElementById('goodField').value = data.good || '';
+      document.getElementById('selfField').value = data.selfCare || '';
+
+      renderPhotos(data.photos || []);
+      renderPeople(data.people || []);
+
+      dayPanel.classList.add('open');
+      dayPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function renderPhotos(photos) {
+      const fan = document.getElementById('photosFan');
+      fan.innerHTML = '';
+      (photos || []).forEach((src, i) => {
+        const img = document.createElement('img');
+        img.className = 'photo-thumb';
+        img.src = src;
+        img.addEventListener('click', () => openLightbox(src));
+        fan.appendChild(img);
+      });
+    }
+
+    const SPEECH_PHRASES = [
+      'Мне очень понравилось проводить время вместе! Давай повторим?',
+      'С тобой этот день стал теплее. Спасибо, что ты есть!',
+      'Кажется, мы отлично сработались. Я рядом, если что.',
+      'Это было по-настоящему важно для меня. До следующего раза!',
+      'Ты делаешь обычные дни особенными. Давай ещё!',
+      'Я улыбаюсь, когда вспоминаю этот день с тобой.',
+      'Спасибо, что разделил(а) этот момент. Ты классный(ая)!',
+      'Мне было спокойно и хорошо рядом. Повторим?',
+      'Ты — часть моей поддержки. Ценю тебя!',
+      'Какой день! Рада/рад, что мы провели его вместе.',
+      'Маленькие радости с тобой — это большая сила.',
+      'Если снова понадобится компания — зови. Я с тобой!'
+    ];
+
+    function randomSpeech() {
+      return SPEECH_PHRASES[Math.floor(Math.random() * SPEECH_PHRASES.length)];
+    }
+
+    function setupCompanionJump(el, avatarId) {
+      if (el._jumpSetup) return;
+      el._jumpSetup = true;
+      const img = el.querySelector('img');
+      let touchActive = false;
+      const start = () => {
+        el.classList.add('jumping');
+        if (img) img.src = gifPath(avatarId, 'run');
+      };
+      const stop = () => {
+        if (touchActive) return;
+        el.classList.remove('jumping');
+        if (img) img.src = gifPath(avatarId, 'blink');
+      };
+      el.addEventListener('mouseenter', start);
+      el.addEventListener('mouseleave', stop);
+      el.addEventListener('touchstart', (e) => { touchActive = true; start(); }, { passive: true });
+      el.addEventListener('touchend', () => { touchActive = false; stop(); });
+      el.addEventListener('touchcancel', () => { touchActive = false; stop(); });
+    }
+
+    function renderCompanions(people) {
+      const stage = document.getElementById('companionsStage');
+      if (!stage) return;
+      stage.innerHTML = '';
+      const list = people || [];
+      if (!list.length) {
+        stage.classList.remove('visible');
+        return;
+      }
+      stage.classList.add('visible');
+      list.forEach((p) => {
+        const el = document.createElement('div');
+        el.className = 'companion';
+        el.innerHTML = `
+          <div class="speech-bubble"></div>
+          <img src="${gifPath(p.avatarId, 'blink')}" alt="${escapeHtml(p.name)}">
+          <div class="comp-name">${escapeHtml(p.name)}</div>
+        `;
+        const bubble = el.querySelector('.speech-bubble');
+        bubble.textContent = randomSpeech();
+        // new phrase each time hover starts
+        el.addEventListener('mouseenter', () => { bubble.textContent = randomSpeech(); });
+        el.addEventListener('touchstart', () => { bubble.textContent = randomSpeech(); }, { passive: true });
+        setupCompanionJump(el, p.avatarId);
+        stage.appendChild(el);
+      });
+    }
+
+    function renderPeople(people) {
+      const row = document.getElementById('peopleRow');
+      const addBtn = document.getElementById('addPersonBtn');
+      row.innerHTML = '';
+      (people || []).forEach((p, i) => {
+        const chip = document.createElement('div');
+        chip.className = 'person-chip';
+        chip.innerHTML = `
+          <img src="${gifPath(p.avatarId, 'blink')}" alt="">
+          <span>${escapeHtml(p.name)}</span>
+          <span class="remove" data-i="${i}">×</span>
+        `;
+        chip.querySelector('.remove').addEventListener('click', () => {
+          if (!weekData[currentDay]) weekData[currentDay] = { good: '', selfCare: '', photos: [], people: [] };
+          weekData[currentDay].people = (weekData[currentDay].people || []).filter((_, idx) => idx !== i);
+          renderPeople(weekData[currentDay].people);
+        });
+        row.appendChild(chip);
+      });
+      row.appendChild(addBtn);
+      renderCompanions(people);
+    }
+
+    document.getElementById('daySaveBtn').addEventListener('click', () => {
+      if (!currentDay) return;
+      const prev = weekData[currentDay] || { photos: [], people: [] };
+      weekData[currentDay] = {
+        date: document.getElementById('dayDateField').value || '',
+        good: document.getElementById('goodField').value.trim(),
+        selfCare: document.getElementById('selfField').value.trim(),
+        photos: prev.photos || [],
+        people: prev.people || []
+      };
+      saveWeek();
+      dayPanel.classList.remove('open');
+      const stage = document.getElementById('companionsStage');
+      if (stage) { stage.classList.remove('visible'); stage.innerHTML = ''; }
+    });
+
+    document.getElementById('dayCloseBtn').addEventListener('click', () => {
+      dayPanel.classList.remove('open');
+      const stage = document.getElementById('companionsStage');
+      if (stage) { stage.classList.remove('visible'); stage.innerHTML = ''; }
+    });
+
+    // Photos
+    document.getElementById('photoAddBtn').addEventListener('click', () => {
+      document.getElementById('photoInput').click();
+    });
+
+    document.getElementById('photoInput').addEventListener('change', (e) => {
+      const files = Array.from(e.target.files || []);
+      if (!files.length || !currentDay) return;
+      if (!weekData[currentDay]) weekData[currentDay] = { good: '', selfCare: '', photos: [], people: [] };
+      if (!weekData[currentDay].photos) weekData[currentDay].photos = [];
+
+      let remaining = files.length;
+      files.forEach(file => {
+        if (!file.type.startsWith('image/')) { remaining--; return; }
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          // compress a bit
+          compressImage(ev.target.result, 900, 0.75).then(dataUrl => {
+            weekData[currentDay].photos.push(dataUrl);
+            remaining--;
+            if (remaining <= 0) {
+              renderPhotos(weekData[currentDay].photos);
+              e.target.value = '';
+            }
+          });
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    function compressImage(dataUrl, maxW, quality) {
+      return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width, h = img.height;
+          if (w > maxW) { h = h * (maxW / w); w = maxW; }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.src = dataUrl;
+      });
+    }
+
+    // Lightbox
+    function openLightbox(src) {
+      document.getElementById('lightboxImg').src = src;
+      const av = document.getElementById('lightboxAvatar');
+      if (centerId) {
+        av.src = gifPath(centerId, 'run'); // happy jump
+        av.style.display = 'block';
+      } else {
+        av.style.display = 'none';
+      }
+      document.getElementById('lightbox').classList.add('open');
+    }
+    document.getElementById('lightboxClose').addEventListener('click', () => {
+      document.getElementById('lightbox').classList.remove('open');
+    });
+    document.getElementById('lightbox').addEventListener('click', (e) => {
+      if (e.target.id === 'lightbox') document.getElementById('lightbox').classList.remove('open');
+    });
+
+    // ---- Person modal ----
+    document.getElementById('addPersonBtn').addEventListener('click', () => {
+      openPersonModal();
+    });
+
+    function openPersonModal() {
+      const existing = document.getElementById('existingPeople');
+      existing.innerHTML = '';
+      if (circleMembers.length) {
+        const title = document.createElement('p');
+        title.style.cssText = 'font-size:0.85rem;font-weight:600;color:var(--text-soft);margin-bottom:8px;';
+        title.textContent = 'Из твоего круга:';
+        existing.appendChild(title);
+        const wrap = document.createElement('div');
+        wrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;';
+        circleMembers.forEach(m => {
+          const btn = document.createElement('button');
+          btn.className = 'person-chip';
+          btn.style.cursor = 'pointer';
+          btn.innerHTML = `<img src="${gifPath(m.avatarId, 'blink')}" alt=""><span>${escapeHtml(m.name)}</span>`;
+          btn.addEventListener('click', () => {
+            addPersonToDay(m.avatarId, m.name);
+            closePersonModal();
+          });
+          wrap.appendChild(btn);
+        });
+        existing.appendChild(wrap);
+      }
+
+      // new avatars grid
+      const grid = document.getElementById('personGrid');
+      grid.innerHTML = '';
+      const usedInDay = new Set((weekData[currentDay]?.people || []).map(p => p.avatarId));
+      CHAR_IDS.forEach(id => {
+        if (usedInDay.has(id) || id === centerId) return;
+        // also skip if already a named member? allow reuse of free avatars
+        const div = document.createElement('div');
+        div.className = 'char-thumb';
+        div.innerHTML = `<img src="${gifPath(id, 'blink')}" alt="">`;
+        div.addEventListener('click', () => {
+          grid.querySelectorAll('.char-thumb').forEach(t => t.classList.remove('selected'));
+          div.classList.add('selected');
+          selectedNewAvatar = id;
+          document.getElementById('personNameWrap').classList.add('visible');
+          checkPersonConfirm();
+        });
+        grid.appendChild(div);
+      });
+
+      selectedNewAvatar = null;
+      document.getElementById('personName').value = '';
+      document.getElementById('personNameWrap').classList.remove('visible');
+      document.getElementById('personConfirmBtn').disabled = true;
+      document.getElementById('personModal').classList.add('open');
+    }
+
+    function checkPersonConfirm() {
+      const name = document.getElementById('personName').value.trim();
+      document.getElementById('personConfirmBtn').disabled = !(selectedNewAvatar && name);
+    }
+    document.getElementById('personName').addEventListener('input', checkPersonConfirm);
+
+    document.getElementById('personConfirmBtn').addEventListener('click', () => {
+      const name = document.getElementById('personName').value.trim();
+      if (!selectedNewAvatar || !name) return;
+      addPersonToDay(selectedNewAvatar, name);
+      // also optionally push into circle? (nice to have)
+      const already = circleMembers.some(m => m.avatarId === selectedNewAvatar);
+      if (!already) {
+        circleMembers.push({ avatarId: selectedNewAvatar, name, help: '', request: '', thank: '' });
+        try {
+          const raw = localStorage.getItem(CIRCLE_KEY);
+          const data = raw ? JSON.parse(raw) : { centerId, members: [] };
+          data.members = circleMembers;
+          localStorage.setItem(CIRCLE_KEY, JSON.stringify(data));
+        } catch (e) {}
+      }
+      closePersonModal();
+    });
+
+    function addPersonToDay(avatarId, name) {
+      if (!weekData[currentDay]) weekData[currentDay] = { good: '', selfCare: '', photos: [], people: [] };
+      if (!weekData[currentDay].people) weekData[currentDay].people = [];
+      // avoid duplicates
+      if (weekData[currentDay].people.some(p => p.avatarId === avatarId)) return;
+      weekData[currentDay].people.push({ avatarId, name });
+      renderPeople(weekData[currentDay].people);
+    }
+
+    function closePersonModal() {
+      document.getElementById('personModal').classList.remove('open');
+    }
+    document.getElementById('personCancelBtn').addEventListener('click', closePersonModal);
+    document.getElementById('personModal').addEventListener('click', (e) => {
+      if (e.target.id === 'personModal') closePersonModal();
+    });
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    // ---- Init ----
+    function init() {
+      loadCircle();
+      loadWeek();
+      updateBadge();
+
+      if (!centerId) {
+        noAvatarMsg.style.display = 'block';
+        hint.style.display = 'none';
+        roadStage.style.opacity = '0.4';
+        roadStage.style.pointerEvents = 'none';
+        return;
+      }
+
+      noAvatarMsg.style.display = 'none';
+      travelerImg.src = gifPath(centerId, 'blink');
+      STATION_POS = getStationPositions();
+      updateRoadPath();
+      placeTravelerAt(0);
+      lastStationIdx = 0;
+      renderStations();
+      renderWeekRail();
+
+      // reposition on resize
+      let t;
+      window.addEventListener('resize', () => {
+        clearTimeout(t);
+        t = setTimeout(() => {
+          STATION_POS = getStationPositions();
+          updateRoadPath();
+          renderStations();
+          placeTravelerAt(lastStationIdx);
+        }, 150);
+      });
+
+      document.getElementById('prevWeekBtn').addEventListener('click', () => {
+        if (currentWeek > 0) switchWeek(currentWeek - 1);
+      });
+      document.getElementById('nextWeekBtn').addEventListener('click', () => {
+        if (currentWeek < TOTAL_WEEKS - 1) switchWeek(currentWeek + 1);
+      });
+
+      const titleEl = document.querySelector('.page-title');
+      if (titleEl) titleEl.textContent = 'Маршрут недели · ' + (currentWeek + 1);
+    }
+
+    init();
+  </script>
+</body>
+</html>

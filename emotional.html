@@ -338,11 +338,17 @@
     }
     .add-star-btn:hover { transform: translateY(-2px); }
 
+    .summary-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 8px;
+    }
     .summary {
       background: rgba(15, 25, 45, 0.75);
       border: 1px solid rgba(168,255,62,0.15);
       border-radius: 16px;
-      padding: 20px;
+      padding: 18px 20px;
     }
     .summary label {
       display: block;
@@ -361,7 +367,7 @@
       font-size: 0.92rem;
       font-weight: 500;
       color: var(--text);
-      min-height: 80px;
+      min-height: 72px;
       resize: vertical;
       outline: none;
     }
@@ -512,9 +518,23 @@
       <button class="add-star-btn" id="addStarBtn">+ Добавить звезду</button>
     </div>
 
-    <div class="summary">
-      <label>Что мне важнее всего?</label>
-      <textarea id="boundary" placeholder="Напиши то, что становится яснее после взгляда на созвездие..."></textarea>
+    <div class="summary-stack" id="summaryStack">
+      <div class="summary">
+        <label for="q-conclusions">Мои выводы после заполнения:</label>
+        <textarea id="q-conclusions" placeholder="Что стало яснее после взгляда на созвездие..."></textarea>
+      </div>
+      <div class="summary">
+        <label for="q-important">Что мне важнее всего:</label>
+        <textarea id="q-important" placeholder="Что для меня сейчас самое важное..."></textarea>
+      </div>
+      <div class="summary">
+        <label for="q-try">Что я хочу попробовать сделать иначе?</label>
+        <textarea id="q-try" placeholder="Какой новый шаг или реакцию хочу попробовать..."></textarea>
+      </div>
+      <div class="summary">
+        <label for="q-notready">Что я пока что не готов(а) поменять?</label>
+        <textarea id="q-notready" placeholder="Что пока оставляю как есть — без давления..."></textarea>
+      </div>
     </div>
     <div class="save-status" id="saveStatus">Сохранено ✓</div>
   </main>
@@ -564,7 +584,11 @@
         '4': { name: 'Звезда 4', x: 82, y: 58, irritates: '', emotion: '', current: '', hypothesis: '' },
         '5': { name: 'Я',        x: 48, y: 80, irritates: '', emotion: '', current: '', hypothesis: '' }
       },
-      boundary: ''
+      boundary: '',
+      conclusions: '',
+      important: '',
+      tryElse: '',
+      notReady: ''
     };
 
     function isFilled(s) {
@@ -590,7 +614,12 @@
           });
         }
       } catch(e) {}
-      document.getElementById('boundary').value = state.boundary || '';
+      // migrate old single boundary → important if new fields empty
+      if (state.boundary && !state.important) state.important = state.boundary;
+      document.getElementById('q-conclusions').value = state.conclusions || '';
+      document.getElementById('q-important').value = state.important || state.boundary || '';
+      document.getElementById('q-try').value = state.tryElse || '';
+      document.getElementById('q-notready').value = state.notReady || '';
       renderStars();
     }
 
@@ -777,10 +806,20 @@
       renderStars();
     });
 
-    document.getElementById('boundary').addEventListener('input', e => {
-      state.boundary = e.target.value;
-      save();
-    });
+    function bindSummaryField(id, key) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('input', e => {
+        state[key] = e.target.value;
+        // keep boundary in sync with important for older PDF/code paths
+        if (key === 'important') state.boundary = e.target.value;
+        save();
+      });
+    }
+    bindSummaryField('q-conclusions', 'conclusions');
+    bindSummaryField('q-important', 'important');
+    bindSummaryField('q-try', 'tryElse');
+    bindSummaryField('q-notready', 'notReady');
 
     load();
   </script>
@@ -802,7 +841,9 @@
           (s.current && s.current.trim()) ||
           (s.hypothesis && s.hypothesis.trim())
         );
-        return filled || !!(state.boundary && state.boundary.trim());
+        const notes = [state.conclusions, state.important, state.tryElse, state.notReady, state.boundary]
+          .some(v => v && String(v).trim());
+        return filled || notes;
       }
       function build() {
         const stars = state.stars || {};
@@ -818,11 +859,20 @@
           </div>`;
         });
         if (!blocks) blocks = '<p class="pdf-muted">Звёзды ещё не заполнены</p>';
-        const boundary = state.boundary && state.boundary.trim()
-          ? `<h2>Граница / вывод</h2><div class="pdf-block"><p>${E(state.boundary)}</p></div>`
-          : '';
+        const qa = [
+          ['Мои выводы после заполнения', state.conclusions],
+          ['Что мне важнее всего', state.important || state.boundary],
+          ['Что я хочу попробовать сделать иначе', state.tryElse],
+          ['Что я пока что не готов(а) поменять', state.notReady]
+        ];
+        let notes = '';
+        qa.forEach(([title, val]) => {
+          if (val && String(val).trim()) {
+            notes += `<h2>${E(title)}</h2><div class="pdf-block"><p>${E(val)}</p></div>`;
+          }
+        });
         return `<h1>Эмоциональная карта</h1><div class="pdf-date">Создано: ${DiaryPdf.dateStamp()}</div>
-          ${blocks}${boundary}`;
+          ${blocks}${notes}`;
       }
       DiaryPdf.init({
         filenamePrefix: 'Emotsionalnaya_karta',

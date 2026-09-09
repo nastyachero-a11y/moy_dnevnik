@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Маршрут недели — Мой дорогой дневник</title>
+  <title>События недели — Мой дорогой дневник</title>
   <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -299,8 +299,11 @@
     /* ========== WEEK FEED (filled days) ========== */
     .week-feed {
       max-width: 1100px;
+      width: 100%;
       margin: 8px auto 28px;
       padding: 0 16px;
+      box-sizing: border-box;
+      overflow: visible;
     }
     .week-feed-title {
       font-size: 0.95rem;
@@ -313,12 +316,16 @@
     .week-feed-list {
       display: flex;
       flex-direction: row;
+      flex-wrap: nowrap;
       gap: 14px;
+      width: 100%;
+      max-width: 100%;
       overflow-x: auto;
       overflow-y: hidden;
       padding: 6px 4px 14px;
       scroll-snap-type: x mandatory;
       -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
     }
     .week-feed-list::-webkit-scrollbar {
       height: 6px;
@@ -884,7 +891,7 @@
 <body>
   <div class="top-bar">
     <a href="index.html" class="back-btn">← Назад</a>
-    <div class="page-title">Маршрут недели</div>
+    <div class="page-title">События недели</div>
     <div class="counter-badge" id="filledBadge">0 / 7 дней</div>
   </div>
 
@@ -936,7 +943,7 @@
   <!-- Large companions (appear when people added to day) -->
   <!-- Feed of filled days -->
   <section class="week-feed" id="weekFeed">
-    <div class="week-feed-title">Лента недели</div>
+    <div class="week-feed-title">Лента событий</div>
     <div class="week-feed-list" id="weekFeedList">
       <div class="week-feed-empty">Пока нет заполненных дней — выбери день на маршруте</div>
     </div>
@@ -1137,7 +1144,7 @@
       renderStations();
       renderWeekRail();
       const titleEl = document.querySelector('.page-title');
-      if (titleEl) titleEl.textContent = 'Маршрут недели · ' + (currentWeek + 1);
+      if (titleEl) titleEl.textContent = 'События недели · ' + (currentWeek + 1);
     }
 
     function formatDM(iso) {
@@ -1158,21 +1165,22 @@
     }
 
     /** Range label for week circle: "07.09-13.09" from Monday date or any known day */
-    function weekDateRangeLabel(wd) {
-      if (!wd) return '';
-      // Prefer Monday
-      let startIso = (wd.mon && wd.mon.date) ? wd.mon.date : null;
-      if (!startIso) {
-        // Infer from any day that has a date: map day key → offset from Monday
-        const offsets = { mon: 0, tue: 1, wed: 2, thu: 3, fri: 4, sat: 5, sun: 6 };
-        for (const d of DAYS) {
-          const day = wd[d.key];
-          if (day && day.date) {
-            startIso = addDaysISO(day.date, -offsets[d.key]);
-            break;
-          }
+    function getWeekStartIso(wd) {
+      if (!wd) return null;
+      if (wd.mon && wd.mon.date) return wd.mon.date;
+      const offsets = { mon: 0, tue: 1, wed: 2, thu: 3, fri: 4, sat: 5, sun: 6 };
+      for (const d of DAYS) {
+        const day = wd[d.key];
+        if (day && day.date) {
+          return addDaysISO(day.date, -offsets[d.key]);
         }
       }
+      return null;
+    }
+
+    function weekDateRangeLabel(wd) {
+      if (!wd) return '';
+      const startIso = getWeekStartIso(wd);
       if (!startIso) return '';
       const endIso = addDaysISO(startIso, 6);
       if (!endIso) return formatDM(startIso);
@@ -1185,22 +1193,43 @@
       const dots = rail.querySelectorAll('.week-dot');
       dots.forEach(d => d.remove());
       const nav = rail.querySelector('.week-nav-row');
+
+      // Build list and sort by calendar start date (earliest first)
+      const items = [];
       for (let w = 0; w < TOTAL_WEEKS; w++) {
         const wd = allWeeks[String(w)] || {};
         const filled = DAYS.filter(d => {
           const day = wd[d.key];
           return day && (day.date || day.good || day.selfCare || (day.photos && day.photos.length) || (day.people && day.people.length));
         }).length;
-        const range = weekDateRangeLabel(wd);
+        const startIso = getWeekStartIso(wd);
+        items.push({ w, wd, filled, startIso });
+      }
+      items.sort((a, b) => {
+        if (a.startIso && b.startIso) {
+          if (a.startIso < b.startIso) return -1;
+          if (a.startIso > b.startIso) return 1;
+          return a.w - b.w;
+        }
+        if (a.startIso && !b.startIso) return -1;
+        if (!a.startIso && b.startIso) return 1;
+        return a.w - b.w;
+      });
+
+      items.forEach((item, orderIdx) => {
+        const range = weekDateRangeLabel(item.wd);
         const el = document.createElement('div');
-        el.className = 'week-dot' + (w === currentWeek ? ' current' : '') + (filled > 0 ? ' has-data' : '');
-        const sub = range || (filled ? filled + '/7' : '—');
-        el.innerHTML = '<span class="wd-num">' + (w + 1) + '</span><span class="wd-fill">' + sub + '</span>';
-        el.title = range ? ('Неделя ' + (w + 1) + ': ' + range) : ('Неделя ' + (w + 1));
-        el.addEventListener('click', () => switchWeek(w));
+        el.className = 'week-dot' + (item.w === currentWeek ? ' current' : '') + (item.filled > 0 ? ' has-data' : '');
+        const displayNum = orderIdx + 1;
+        const sub = range || (item.filled ? item.filled + '/7' : '—');
+        el.innerHTML = '<span class="wd-num">' + displayNum + '</span><span class="wd-fill">' + sub + '</span>';
+        el.title = range
+          ? ('Неделя ' + displayNum + ': ' + range)
+          : ('Неделя ' + displayNum);
+        el.addEventListener('click', () => switchWeek(item.w));
         if (nav) rail.insertBefore(el, nav);
         else rail.appendChild(el);
-      }
+      });
     }
 
     function isDayFilled(day) {
@@ -1792,7 +1821,7 @@
       });
 
       const titleEl = document.querySelector('.page-title');
-      if (titleEl) titleEl.textContent = 'Маршрут недели · ' + (currentWeek + 1);
+      if (titleEl) titleEl.textContent = 'События недели · ' + (currentWeek + 1);
     }
 
     init();

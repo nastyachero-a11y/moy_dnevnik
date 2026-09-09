@@ -418,43 +418,54 @@
     .week-export-sheet .ex-day {
       font-weight: 800;
       color: #1e4fd6;
-      font-size: 1rem;
+      font-size: 1.28rem;
     }
     .week-export-sheet .ex-date {
-      font-size: 0.78rem;
+      font-size: 0.95rem;
       font-weight: 700;
       color: #5a6a85;
       background: #eef2ff;
-      padding: 2px 10px;
+      padding: 4px 12px;
       border-radius: 999px;
     }
+    .week-export-sheet .ex-card-row {
+      display: flex;
+      flex-direction: row;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .week-export-sheet .ex-card-main {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
     .week-export-sheet .ex-label {
-      font-size: 0.68rem;
+      font-size: 0.82rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.04em;
       color: #7a8aa0;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
     .week-export-sheet .ex-text {
-      font-size: 0.88rem;
-      font-weight: 500;
-      line-height: 1.35;
-      margin-bottom: 8px;
+      font-size: 1.12rem;
+      font-weight: 600;
+      line-height: 1.45;
+      margin-bottom: 10px;
       white-space: pre-wrap;
       word-break: break-word;
     }
     .week-export-sheet .ex-photos {
       display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 6px;
+      flex-direction: column;
+      gap: 8px;
+      flex: 0 0 auto;
     }
     .week-export-sheet .ex-photos img {
-      width: 64px;
-      height: 64px;
+      width: 140px;
+      height: 140px;
       object-fit: cover;
-      border-radius: 8px;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.12);
     }
     .week-export-sheet .ex-people-inline {
       display: flex;
@@ -608,16 +619,16 @@
     .feed-card {
       background: rgba(255,255,255,0.96);
       border-radius: 18px;
-      padding: 16px 16px 14px;
+      padding: 18px 18px 16px;
       color: var(--text);
       box-shadow: 0 10px 28px rgba(0,0,0,0.14);
       cursor: pointer;
       transition: transform 0.18s ease, box-shadow 0.18s ease;
       border: 2px solid transparent;
       text-align: left;
-      width: 280px;
-      min-width: 280px;
-      max-width: 280px;
+      width: 360px;
+      min-width: 360px;
+      max-width: 360px;
       flex: 0 0 auto;
       scroll-snap-align: start;
       font-family: inherit;
@@ -637,50 +648,62 @@
       flex-wrap: wrap;
     }
     .feed-day-name {
-      font-size: 1.05rem;
+      font-size: 1.22rem;
       font-weight: 800;
       color: var(--blue-accent);
     }
     .feed-day-date {
-      font-size: 0.82rem;
+      font-size: 0.92rem;
       font-weight: 700;
       color: var(--text-soft);
       background: #eef2ff;
-      padding: 3px 10px;
+      padding: 4px 12px;
       border-radius: 999px;
     }
+    .feed-body {
+      display: flex;
+      flex-direction: row;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .feed-body-text {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
     .feed-section {
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
     .feed-section:last-child { margin-bottom: 0; }
     .feed-label {
-      font-size: 0.7rem;
+      font-size: 0.78rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.04em;
       color: var(--text-soft);
-      margin-bottom: 3px;
+      margin-bottom: 4px;
     }
     .feed-text {
-      font-size: 0.92rem;
-      font-weight: 500;
-      line-height: 1.4;
+      font-size: 1.08rem;
+      font-weight: 600;
+      line-height: 1.45;
       color: var(--text);
       white-space: pre-wrap;
       word-break: break-word;
     }
     .feed-photos {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
+      flex-wrap: nowrap;
       gap: 8px;
-      margin-top: 4px;
+      flex: 0 0 auto;
+      max-width: 120px;
     }
     .feed-photos img {
-      width: 72px;
-      height: 72px;
+      width: 110px;
+      height: 110px;
       object-fit: cover;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.14);
     }
     .feed-people {
       display: flex;
@@ -1142,6 +1165,10 @@
         min-width: 0;
         max-width: none;
       }
+      .feed-day-name { font-size: 1.18rem; }
+      .feed-text { font-size: 1.05rem; }
+      .feed-photos img { width: 96px; height: 96px; }
+      .feed-body { gap: 12px; }
       .main-layout {
         grid-template-columns: 1fr;
         gap: 8px;
@@ -1551,18 +1578,13 @@
         }
         body += '</div>';
 
+        body += '<div class="feed-body">';
+        body += '<div class="feed-body-text">';
         if (data.good) {
           body += '<div class="feed-section"><div class="feed-label">Что хорошего</div><div class="feed-text">' + escapeHtml(data.good) + '</div></div>';
         }
         if (data.selfCare) {
           body += '<div class="feed-section"><div class="feed-label">Для себя</div><div class="feed-text">' + escapeHtml(data.selfCare) + '</div></div>';
-        }
-        if (data.photos && data.photos.length) {
-          body += '<div class="feed-section"><div class="feed-label">Фото</div><div class="feed-photos">';
-          data.photos.forEach((src) => {
-            body += '<img src="' + src + '" alt="">';
-          });
-          body += '</div></div>';
         }
         if (data.people && data.people.length) {
           body += '<div class="feed-section"><div class="feed-label">Кто был рядом</div><div class="feed-people">';
@@ -1571,6 +1593,15 @@
           });
           body += '</div></div>';
         }
+        body += '</div>'; // text
+        if (data.photos && data.photos.length) {
+          body += '<div class="feed-photos">';
+          data.photos.forEach((src) => {
+            body += '<img src="' + src + '" alt="">';
+          });
+          body += '</div>';
+        }
+        body += '</div>'; // body
 
         card.innerHTML = body;
         card.addEventListener('click', () => {
@@ -2191,19 +2222,6 @@
         sheet.id = 'weekExportSheet';
 
         const range = weekRangeTitle();
-        const route = buildRouteSvg();
-
-        let stationsHtml = '';
-        DAYS.forEach((d, i) => {
-          const pos = route.pts[i];
-          const day = weekData[d.key];
-          const done = isDayFilled(day);
-          const left = (pos.x * 100).toFixed(2) + '%';
-          const top = (pos.y * 100).toFixed(2) + '%';
-          stationsHtml += '<div class="ex-station' + (done ? ' done' : '') + '" style="left:' + left + ';top:' + top + '">'
-            + '<div class="ex-station-circle">' + (done ? '\u2713' : d.label) + '</div>'
-            + '<div class="ex-station-label">' + d.full + '</div></div>';
-        });
 
         let feedHtml = '';
         const filledDays = DAYS.filter(d => isDayFilled(weekData[d.key]));
@@ -2212,29 +2230,34 @@
         } else {
           filledDays.forEach(d => {
             const data = weekData[d.key] || {};
-            feedHtml += '<div class="ex-card"><div class="ex-card-head">';
+            feedHtml += '<div class="ex-card">';
+            feedHtml += '<div class="ex-card-head">';
             feedHtml += '<span class="ex-day">' + escapeHtml(d.full) + '</span>';
             if (data.date) feedHtml += '<span class="ex-date">' + escapeHtml(formatDateLong(data.date)) + '</span>';
             feedHtml += '</div>';
+            feedHtml += '<div class="ex-card-row">';
+            feedHtml += '<div class="ex-card-main">';
             if (data.good) {
               feedHtml += '<div class="ex-label">Что хорошего</div><div class="ex-text">' + escapeHtml(data.good) + '</div>';
             }
             if (data.selfCare) {
               feedHtml += '<div class="ex-label">Для себя</div><div class="ex-text">' + escapeHtml(data.selfCare) + '</div>';
             }
-            if (data.photos && data.photos.length) {
-              feedHtml += '<div class="ex-photos">';
-              data.photos.forEach(src => { feedHtml += '<img src="' + src + '" alt="">'; });
-              feedHtml += '</div>';
-            }
             if (data.people && data.people.length) {
-              feedHtml += '<div class="ex-people-inline">';
+              feedHtml += '<div class="ex-label">Кто был рядом</div><div class="ex-people-inline">';
               data.people.forEach(p => {
                 feedHtml += '<span><img src="' + gifPath(p.avatarId, 'blink') + '" alt="">' + escapeHtml(p.name) + '</span>';
               });
               feedHtml += '</div>';
             }
-            feedHtml += '</div>';
+            feedHtml += '</div>'; // main
+            if (data.photos && data.photos.length) {
+              feedHtml += '<div class="ex-photos">';
+              data.photos.forEach(src => { feedHtml += '<img src="' + src + '" alt="">'; });
+              feedHtml += '</div>';
+            }
+            feedHtml += '</div>'; // row
+            feedHtml += '</div>'; // card
           });
         }
 
@@ -2259,13 +2282,6 @@
         sheet.innerHTML = ''
           + '<h1>События недели</h1>'
           + '<div class="ex-sub">' + escapeHtml(range) + '</div>'
-          + '<div class="ex-route">'
-          +   '<svg viewBox="0 0 ' + route.W + ' ' + route.H + '" preserveAspectRatio="none">'
-          +     '<path d="' + route.d + '" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>'
-          +     '<path d="' + route.d + '" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>'
-          +   '</svg>'
-          +   stationsHtml
-          + '</div>'
           + '<div class="ex-section-title">Лента событий</div>'
           + '<div class="ex-feed">' + feedHtml + '</div>'
           + '<div class="ex-section-title">Персонажи недели</div>'

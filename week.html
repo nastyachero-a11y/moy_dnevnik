@@ -296,6 +296,253 @@
       text-shadow: 0 1px 6px rgba(0,0,0,0.25);
     }
 
+    .img-save-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.92);
+      color: var(--blue);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+      transition: transform 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+    .img-save-btn:hover { background: #fff; transform: translateY(-1px); }
+    .img-save-btn:disabled { opacity: 0.65; cursor: wait; transform: none; }
+    @media (max-width: 640px) {
+      .img-save-btn .img-save-label { display: none; }
+      .img-save-btn { padding: 8px 12px; border-radius: 50%; width: 40px; height: 40px; justify-content: center; }
+    }
+
+    .week-export-sheet {
+      position: fixed;
+      left: -9999px;
+      top: 0;
+      width: 900px;
+      background: linear-gradient(165deg, #1e6bb8 0%, #2a9d8f 55%, #52b788 100%);
+      color: #fff;
+      padding: 28px 28px 32px;
+      font-family: 'Nunito', system-ui, sans-serif;
+      box-sizing: border-box;
+      z-index: -1;
+    }
+    .week-export-sheet h1 {
+      margin: 0 0 6px;
+      font-size: 1.55rem;
+      font-weight: 800;
+      text-align: center;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .week-export-sheet .ex-sub {
+      text-align: center;
+      font-size: 0.95rem;
+      font-weight: 700;
+      opacity: 0.95;
+      margin-bottom: 18px;
+    }
+    .week-export-sheet .ex-route {
+      position: relative;
+      height: 220px;
+      margin: 0 0 22px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .week-export-sheet .ex-route svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .week-export-sheet .ex-station {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .week-export-sheet .ex-station-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.95);
+      color: #1A3B5C;
+      font-weight: 800;
+      font-size: 0.72rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    }
+    .week-export-sheet .ex-station.done .ex-station-circle {
+      background: linear-gradient(135deg, #2bb673, #a8ff3e);
+      color: #0d3d24;
+    }
+    .week-export-sheet .ex-station-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      margin-top: 3px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .week-export-sheet .ex-section-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin: 0 0 12px;
+      text-align: center;
+    }
+    .week-export-sheet .ex-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+    .week-export-sheet .ex-card {
+      background: rgba(255,255,255,0.96);
+      color: #1a2744;
+      border-radius: 14px;
+      padding: 14px 16px;
+      text-align: left;
+    }
+    .week-export-sheet .ex-card-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .week-export-sheet .ex-day {
+      font-weight: 800;
+      color: #1e4fd6;
+      font-size: 1rem;
+    }
+    .week-export-sheet .ex-date {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #5a6a85;
+      background: #eef2ff;
+      padding: 2px 10px;
+      border-radius: 999px;
+    }
+    .week-export-sheet .ex-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #7a8aa0;
+      margin-bottom: 2px;
+    }
+    .week-export-sheet .ex-text {
+      font-size: 0.88rem;
+      font-weight: 500;
+      line-height: 1.35;
+      margin-bottom: 8px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .week-export-sheet .ex-photos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .week-export-sheet .ex-photos img {
+      width: 64px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .week-export-sheet .ex-people-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .week-export-sheet .ex-people-inline span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #f0f7ff;
+      border-radius: 999px;
+      padding: 2px 8px 2px 2px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #1e4fd6;
+    }
+    .week-export-sheet .ex-people-inline img {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+    }
+    .week-export-sheet .ex-chars {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 18px 22px;
+      padding: 12px 8px 4px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 16px;
+    }
+    .week-export-sheet .ex-char {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 120px;
+    }
+    .week-export-sheet .ex-bubble {
+      background: #fff;
+      color: #1a2744;
+      font-size: 0.68rem;
+      font-weight: 600;
+      line-height: 1.25;
+      padding: 8px 10px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      text-align: center;
+      margin-bottom: 6px;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .week-export-sheet .ex-char img {
+      width: 88px;
+      height: 110px;
+      object-fit: contain;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.25));
+    }
+    .week-export-sheet .ex-char-name {
+      margin-top: 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: rgba(255,255,255,0.92);
+      color: #1e4fd6;
+      padding: 3px 10px;
+      border-radius: 12px;
+      max-width: 120px;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .week-export-sheet .ex-empty {
+      text-align: center;
+      opacity: 0.85;
+      font-weight: 600;
+      padding: 8px;
+    }
+    .week-export-sheet .ex-footer {
+      text-align: center;
+      font-size: 0.75rem;
+      opacity: 0.75;
+      margin-top: 16px;
+      font-weight: 600;
+    }
+
     /* ========== WEEK FEED (filled days) ========== */
     .week-feed {
       max-width: 1100px;
@@ -840,6 +1087,14 @@
       border-radius: 12px;
       box-shadow: 0 12px 40px rgba(0,0,0,0.4);
       object-fit: contain;
+      transform-origin: center center;
+      transition: transform 0.08s ease-out;
+      cursor: zoom-in;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    .lightbox img.main.zoomed {
+      cursor: grab;
     }
     .lightbox-avatar {
       width: 100px;
@@ -916,7 +1171,12 @@
   <div class="top-bar">
     <a href="index.html" class="back-btn">← Назад</a>
     <div class="page-title">События недели</div>
-    <div class="counter-badge" id="filledBadge">0 / 7 дней</div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+      <button type="button" class="img-save-btn" id="saveWeekImgBtn" title="Сохранить картинкой">
+        <span>&#128444;</span><span class="img-save-label">Сохранить картинкой</span>
+      </button>
+      <div class="counter-badge" id="filledBadge">0 / 7 дней</div>
+    </div>
   </div>
 
   <p class="hint" id="hint">Выбери день — твой персонаж отправится в путь</p>
@@ -1679,9 +1939,22 @@
       });
     }
 
-    // Lightbox
+    // Lightbox with mouse-wheel zoom (desktop)
+    let lbScale = 1;
+    const LB_MIN = 1;
+    const LB_MAX = 4;
+    const lightboxEl = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+
+    function resetLightboxZoom() {
+      lbScale = 1;
+      lightboxImg.style.transform = 'scale(1)';
+      lightboxImg.classList.remove('zoomed');
+    }
+
     function openLightbox(src) {
-      document.getElementById('lightboxImg').src = src;
+      resetLightboxZoom();
+      lightboxImg.src = src;
       const av = document.getElementById('lightboxAvatar');
       if (centerId) {
         av.src = gifPath(centerId, 'run'); // happy jump
@@ -1689,13 +1962,42 @@
       } else {
         av.style.display = 'none';
       }
-      document.getElementById('lightbox').classList.add('open');
+      lightboxEl.classList.add('open');
     }
-    document.getElementById('lightboxClose').addEventListener('click', () => {
-      document.getElementById('lightbox').classList.remove('open');
+
+    function closeLightbox() {
+      lightboxEl.classList.remove('open');
+      resetLightboxZoom();
+    }
+
+    document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+    lightboxEl.addEventListener('click', (e) => {
+      if (e.target.id === 'lightbox') closeLightbox();
     });
-    document.getElementById('lightbox').addEventListener('click', (e) => {
-      if (e.target.id === 'lightbox') document.getElementById('lightbox').classList.remove('open');
+
+    // Wheel zoom on PC
+    lightboxEl.addEventListener('wheel', (e) => {
+      if (!lightboxEl.classList.contains('open')) return;
+      // only when pointer is over the image or lightbox
+      e.preventDefault();
+      const delta = e.deltaY;
+      const step = delta > 0 ? -0.15 : 0.15;
+      lbScale = Math.min(LB_MAX, Math.max(LB_MIN, lbScale + step));
+      lightboxImg.style.transform = 'scale(' + lbScale.toFixed(3) + ')';
+      if (lbScale > 1.02) lightboxImg.classList.add('zoomed');
+      else lightboxImg.classList.remove('zoomed');
+    }, { passive: false });
+
+    // Optional: double-click toggles zoom
+    lightboxImg.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      if (lbScale > 1.05) {
+        resetLightboxZoom();
+      } else {
+        lbScale = 2;
+        lightboxImg.style.transform = 'scale(2)';
+        lightboxImg.classList.add('zoomed');
+      }
     });
 
     // ---- Person modal ----
@@ -1840,5 +2142,185 @@
 
     init();
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script>
+    (function () {
+      const btn = document.getElementById('saveWeekImgBtn');
+      if (!btn) return;
+
+      function collectWeekPeople() {
+        const map = new Map();
+        DAYS.forEach(d => {
+          const day = weekData[d.key];
+          if (!day || !day.people) return;
+          day.people.forEach(p => {
+            const key = (p.avatarId || '') + '|' + (p.name || '');
+            if (!map.has(key)) map.set(key, { avatarId: p.avatarId, name: p.name || 'Друг' });
+          });
+        });
+        return Array.from(map.values());
+      }
+
+      function weekRangeTitle() {
+        const range = typeof weekDateRangeLabel === 'function' ? weekDateRangeLabel(weekData) : '';
+        return range || ('Неделя ' + (currentWeek + 1));
+      }
+
+      function buildRouteSvg() {
+        const pts = getStationPositions();
+        const W = 840, H = 200;
+        const d = buildCurvePath(pts, W, H);
+        return { d, pts, W, H };
+      }
+
+      function waitImages(root) {
+        const imgs = Array.from(root.querySelectorAll('img'));
+        return Promise.all(imgs.map(img => {
+          if (img.complete && img.naturalWidth) return Promise.resolve();
+          return new Promise(res => {
+            img.onload = () => res();
+            img.onerror = () => res();
+            setTimeout(res, 2500);
+          });
+        }));
+      }
+
+      function buildExportSheet() {
+        const sheet = document.createElement('div');
+        sheet.className = 'week-export-sheet';
+        sheet.id = 'weekExportSheet';
+
+        const range = weekRangeTitle();
+        const route = buildRouteSvg();
+
+        let stationsHtml = '';
+        DAYS.forEach((d, i) => {
+          const pos = route.pts[i];
+          const day = weekData[d.key];
+          const done = isDayFilled(day);
+          const left = (pos.x * 100).toFixed(2) + '%';
+          const top = (pos.y * 100).toFixed(2) + '%';
+          stationsHtml += '<div class="ex-station' + (done ? ' done' : '') + '" style="left:' + left + ';top:' + top + '">'
+            + '<div class="ex-station-circle">' + (done ? '\u2713' : d.label) + '</div>'
+            + '<div class="ex-station-label">' + d.full + '</div></div>';
+        });
+
+        let feedHtml = '';
+        const filledDays = DAYS.filter(d => isDayFilled(weekData[d.key]));
+        if (!filledDays.length) {
+          feedHtml = '<div class="ex-empty">Пока нет заполненных дней</div>';
+        } else {
+          filledDays.forEach(d => {
+            const data = weekData[d.key] || {};
+            feedHtml += '<div class="ex-card"><div class="ex-card-head">';
+            feedHtml += '<span class="ex-day">' + escapeHtml(d.full) + '</span>';
+            if (data.date) feedHtml += '<span class="ex-date">' + escapeHtml(formatDateLong(data.date)) + '</span>';
+            feedHtml += '</div>';
+            if (data.good) {
+              feedHtml += '<div class="ex-label">Что хорошего</div><div class="ex-text">' + escapeHtml(data.good) + '</div>';
+            }
+            if (data.selfCare) {
+              feedHtml += '<div class="ex-label">Для себя</div><div class="ex-text">' + escapeHtml(data.selfCare) + '</div>';
+            }
+            if (data.photos && data.photos.length) {
+              feedHtml += '<div class="ex-photos">';
+              data.photos.forEach(src => { feedHtml += '<img src="' + src + '" alt="">'; });
+              feedHtml += '</div>';
+            }
+            if (data.people && data.people.length) {
+              feedHtml += '<div class="ex-people-inline">';
+              data.people.forEach(p => {
+                feedHtml += '<span><img src="' + gifPath(p.avatarId, 'blink') + '" alt="">' + escapeHtml(p.name) + '</span>';
+              });
+              feedHtml += '</div>';
+            }
+            feedHtml += '</div>';
+          });
+        }
+
+        const people = collectWeekPeople();
+        let charsHtml = '';
+        if (!people.length) {
+          charsHtml = '<div class="ex-empty">Персонажи этой недели ещё не добавлены</div>';
+        } else {
+          const phrases = (typeof SPEECH_PHRASES !== 'undefined' ? SPEECH_PHRASES.slice() : [
+            'Мне очень понравилось проводить время вместе! Давай повторим?'
+          ]);
+          people.forEach((p, i) => {
+            const phrase = phrases[i % phrases.length];
+            charsHtml += '<div class="ex-char">'
+              + '<div class="ex-bubble">' + escapeHtml(phrase) + '</div>'
+              + '<img src="' + gifPath(p.avatarId, 'run') + '" alt="' + escapeHtml(p.name) + '">'
+              + '<div class="ex-char-name">' + escapeHtml(p.name) + '</div>'
+              + '</div>';
+          });
+        }
+
+        sheet.innerHTML = ''
+          + '<h1>События недели</h1>'
+          + '<div class="ex-sub">' + escapeHtml(range) + '</div>'
+          + '<div class="ex-route">'
+          +   '<svg viewBox="0 0 ' + route.W + ' ' + route.H + '" preserveAspectRatio="none">'
+          +     '<path d="' + route.d + '" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>'
+          +     '<path d="' + route.d + '" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>'
+          +   '</svg>'
+          +   stationsHtml
+          + '</div>'
+          + '<div class="ex-section-title">Лента событий</div>'
+          + '<div class="ex-feed">' + feedHtml + '</div>'
+          + '<div class="ex-section-title">Персонажи недели</div>'
+          + '<div class="ex-chars">' + charsHtml + '</div>'
+          + '<div class="ex-footer">Мой дорогой дневник</div>';
+
+        document.body.appendChild(sheet);
+        return sheet;
+      }
+
+      async function saveAsImage() {
+        if (!window.html2canvas) {
+          alert('Не удалось загрузить модуль сохранения. Проверьте интернет и обновите страницу.');
+          return;
+        }
+        btn.disabled = true;
+        const prevLabel = btn.innerHTML;
+        btn.innerHTML = '<span>\u23F3</span><span class="img-save-label">Сохраняю\u2026</span>';
+
+        let sheet = null;
+        try {
+          sheet = buildExportSheet();
+          await waitImages(sheet);
+          await new Promise(r => setTimeout(r, 450));
+
+          const canvas = await html2canvas(sheet, {
+            backgroundColor: null,
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            logging: false,
+            width: sheet.offsetWidth,
+            height: sheet.scrollHeight,
+            windowWidth: sheet.offsetWidth,
+            windowHeight: sheet.scrollHeight
+          });
+
+          const a = document.createElement('a');
+          const stamp = new Date().toISOString().slice(0, 10);
+          a.download = 'Sobytia_nedeli_' + stamp + '.png';
+          a.href = canvas.toDataURL('image/png');
+          a.click();
+        } catch (err) {
+          console.error(err);
+          alert('Не получилось сохранить картинку. Попробуйте ещё раз.');
+        } finally {
+          if (sheet && sheet.parentNode) sheet.parentNode.removeChild(sheet);
+          btn.disabled = false;
+          btn.innerHTML = prevLabel;
+        }
+      }
+
+      btn.addEventListener('click', saveAsImage);
+    })();
+  </script>
 </body>
 </html>
+

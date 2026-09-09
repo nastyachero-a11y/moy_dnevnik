@@ -296,6 +296,147 @@
       text-shadow: 0 1px 6px rgba(0,0,0,0.25);
     }
 
+    /* ========== WEEK FEED (filled days) ========== */
+    .week-feed {
+      max-width: 1100px;
+      margin: 8px auto 28px;
+      padding: 0 16px;
+    }
+    .week-feed-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 14px;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.2);
+      opacity: 0.95;
+    }
+    .week-feed-list {
+      display: flex;
+      flex-direction: row;
+      gap: 14px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 6px 4px 14px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .week-feed-list::-webkit-scrollbar {
+      height: 6px;
+    }
+    .week-feed-list::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.35);
+      border-radius: 99px;
+    }
+    .feed-card {
+      background: rgba(255,255,255,0.96);
+      border-radius: 18px;
+      padding: 16px 16px 14px;
+      color: var(--text);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.14);
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      border: 2px solid transparent;
+      text-align: left;
+      width: 280px;
+      min-width: 280px;
+      max-width: 280px;
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+      font-family: inherit;
+    }
+    .feed-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px rgba(0,0,0,0.18);
+      border-color: rgba(30,79,214,0.25);
+    }
+    .feed-card:active { transform: scale(0.99); }
+    .feed-card-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .feed-day-name {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--blue-accent);
+    }
+    .feed-day-date {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-soft);
+      background: #eef2ff;
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+    .feed-section {
+      margin-bottom: 10px;
+    }
+    .feed-section:last-child { margin-bottom: 0; }
+    .feed-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-soft);
+      margin-bottom: 3px;
+    }
+    .feed-text {
+      font-size: 0.92rem;
+      font-weight: 500;
+      line-height: 1.4;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .feed-photos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .feed-photos img {
+      width: 72px;
+      height: 72px;
+      object-fit: cover;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+    .feed-people {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+      align-items: center;
+    }
+    .feed-person {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f0f7ff;
+      border-radius: 999px;
+      padding: 3px 10px 3px 3px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--blue);
+    }
+    .feed-person img {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+    }
+    .week-feed-empty {
+      text-align: center;
+      font-size: 0.88rem;
+      font-weight: 600;
+      opacity: 0.75;
+      padding: 12px;
+      width: 100%;
+      flex: 1 0 auto;
+    }
+
     /* ========== DAY PANEL ========== */
     .day-panel {
       display: none;
@@ -703,6 +844,18 @@
     }
 
     @media (max-width: 640px) {
+      .week-feed-list {
+        flex-direction: column;
+        overflow-x: visible;
+        overflow-y: visible;
+        scroll-snap-type: none;
+        padding-bottom: 4px;
+      }
+      .feed-card {
+        width: 100%;
+        min-width: 0;
+        max-width: none;
+      }
       .main-layout {
         grid-template-columns: 1fr;
         gap: 8px;
@@ -781,6 +934,14 @@
   </div>
 
   <!-- Large companions (appear when people added to day) -->
+  <!-- Feed of filled days -->
+  <section class="week-feed" id="weekFeed">
+    <div class="week-feed-title">Лента недели</div>
+    <div class="week-feed-list" id="weekFeedList">
+      <div class="week-feed-empty">Пока нет заполненных дней — выбери день на маршруте</div>
+    </div>
+  </section>
+
   <div class="companions-stage" id="companionsStage"></div>
 
   <!-- Day editing panel -->
@@ -1042,12 +1203,80 @@
       }
     }
 
+    function isDayFilled(day) {
+      return !!(day && (day.date || day.good || day.selfCare || (day.photos && day.photos.length) || (day.people && day.people.length)));
+    }
+
+    function formatDateLong(iso) {
+      if (!iso) return '';
+      const p = iso.split('-');
+      if (p.length !== 3) return iso;
+      return p[2] + '.' + p[1] + '.' + p[0];
+    }
+
+    function renderWeekFeed() {
+      const list = document.getElementById('weekFeedList');
+      if (!list) return;
+      list.innerHTML = '';
+      const filledDays = DAYS.filter(d => isDayFilled(weekData[d.key]));
+      if (!filledDays.length) {
+        list.innerHTML = '<div class="week-feed-empty">Пока нет заполненных дней — выбери день на маршруте</div>';
+        return;
+      }
+      filledDays.forEach((d) => {
+        const data = weekData[d.key] || {};
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'feed-card';
+        card.dataset.day = d.key;
+
+        let body = '';
+        body += '<div class="feed-card-head">';
+        body += '<span class="feed-day-name">' + escapeHtml(d.full) + '</span>';
+        if (data.date) {
+          body += '<span class="feed-day-date">' + escapeHtml(formatDateLong(data.date)) + '</span>';
+        }
+        body += '</div>';
+
+        if (data.good) {
+          body += '<div class="feed-section"><div class="feed-label">Что хорошего</div><div class="feed-text">' + escapeHtml(data.good) + '</div></div>';
+        }
+        if (data.selfCare) {
+          body += '<div class="feed-section"><div class="feed-label">Для себя</div><div class="feed-text">' + escapeHtml(data.selfCare) + '</div></div>';
+        }
+        if (data.photos && data.photos.length) {
+          body += '<div class="feed-section"><div class="feed-label">Фото</div><div class="feed-photos">';
+          data.photos.forEach((src) => {
+            body += '<img src="' + src + '" alt="">';
+          });
+          body += '</div></div>';
+        }
+        if (data.people && data.people.length) {
+          body += '<div class="feed-section"><div class="feed-label">Кто был рядом</div><div class="feed-people">';
+          data.people.forEach((p) => {
+            body += '<span class="feed-person"><img src="' + gifPath(p.avatarId, 'blink') + '" alt=""><span>' + escapeHtml(p.name) + '</span></span>';
+          });
+          body += '</div></div>';
+        }
+
+        card.innerHTML = body;
+        card.addEventListener('click', () => {
+          const idx = DAYS.findIndex(x => x.key === d.key);
+          if (idx < 0 || !centerId) return;
+          goToDay(idx);
+          // scroll panel into view after open
+          setTimeout(() => {
+            dayPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }, 50);
+        });
+        list.appendChild(card);
+      });
+    }
+
     function updateBadge() {
-      const n = DAYS.filter(d => {
-        const day = weekData[d.key];
-        return day && (day.date || day.good || day.selfCare || (day.photos && day.photos.length) || (day.people && day.people.length));
-      }).length;
+      const n = DAYS.filter(d => isDayFilled(weekData[d.key])).length;
       filledBadge.textContent = `${n} / 7 дней`;
+      renderWeekFeed();
     }
 
     // ---- Road path (responsive curved, like zones map) ----
@@ -1320,6 +1549,7 @@
           if (!weekData[currentDay]) weekData[currentDay] = { good: '', selfCare: '', photos: [], people: [] };
           weekData[currentDay].people = (weekData[currentDay].people || []).filter((_, idx) => idx !== i);
           renderPeople(weekData[currentDay].people);
+          saveWeek();
         });
         row.appendChild(chip);
       });
@@ -1372,6 +1602,7 @@
             if (remaining <= 0) {
               renderPhotos(weekData[currentDay].photos);
               e.target.value = '';
+              saveWeek();
             }
           });
         };
@@ -1501,6 +1732,7 @@
       if (weekData[currentDay].people.some(p => p.avatarId === avatarId)) return;
       weekData[currentDay].people.push({ avatarId, name });
       renderPeople(weekData[currentDay].people);
+      saveWeek();
     }
 
     function closePersonModal() {

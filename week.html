@@ -1752,18 +1752,8 @@
     document.getElementById('personConfirmBtn').addEventListener('click', () => {
       const name = document.getElementById('personName').value.trim();
       if (!selectedNewAvatar || !name) return;
+      // Только в события дня — в ресурсный круг не добавляем
       addPersonToDay(selectedNewAvatar, name);
-      // also optionally push into circle? (nice to have)
-      const already = circleMembers.some(m => m.avatarId === selectedNewAvatar);
-      if (!already) {
-        circleMembers.push({ avatarId: selectedNewAvatar, name, help: '', request: '', thank: '' });
-        try {
-          const raw = localStorage.getItem(CIRCLE_KEY);
-          const data = raw ? JSON.parse(raw) : { centerId, members: [] };
-          data.members = circleMembers;
-          localStorage.setItem(CIRCLE_KEY, JSON.stringify(data));
-        } catch (e) {}
-      }
       closePersonModal();
     });
 

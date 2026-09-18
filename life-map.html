@@ -66,12 +66,12 @@
       pointer-events: none;
     }
     .map-svg path.branch {
-      fill: none; stroke: rgba(255,255,255,0.45);
-      stroke-width: 1.8; stroke-linecap: round;
+      fill: none; stroke: rgba(255,255,255,0.4);
+      stroke-width: 1; stroke-linecap: round;
     }
     .map-svg path.sub {
-      fill: none; stroke: rgba(255,255,255,0.35);
-      stroke-width: 1.3; stroke-linecap: round;
+      fill: none; stroke: rgba(255,255,255,0.32);
+      stroke-width: 0.8; stroke-linecap: round;
     }
     .map-svg path.done {
       stroke: rgba(168,255,62,0.65);
@@ -297,10 +297,6 @@
         <input type="text" id="taskSphereName" readonly style="background:#f4f6fa;font-weight:700;color:#1e4fd6;">
       </div>
       <div class="field">
-        <label>Название сферы (можно переименовать)</label>
-        <input type="text" id="renameSphere" maxlength="24" placeholder="Название сферы">
-      </div>
-      <div class="field">
         <label>Конкретный шаг / цель</label>
         <input type="text" id="taskText" placeholder="Что именно сделаю" maxlength="60">
       </div>
@@ -465,8 +461,7 @@
       if (!s) return;
       document.getElementById('taskModalTitle').textContent = 'Новый шаг';
       document.getElementById('taskSphereName').value = s.name;
-      document.getElementById('renameSphere').value = s.name;
-      document.getElementById('taskText').value = '';
+            document.getElementById('taskText').value = '';
       document.getElementById('taskWhy').value = '';
       document.getElementById('taskDone').checked = false;
       document.getElementById('doneRow').hidden = true;
@@ -484,8 +479,7 @@
       if (!s || !t) return;
       document.getElementById('taskModalTitle').textContent = 'Редактировать шаг';
       document.getElementById('taskSphereName').value = s.name;
-      document.getElementById('renameSphere').value = s.name;
-      document.getElementById('taskText').value = t.text;
+            document.getElementById('taskText').value = t.text;
       document.getElementById('taskWhy').value = t.why || '';
       document.getElementById('taskDone').checked = !!t.done;
       document.getElementById('doneRow').hidden = false;
@@ -497,9 +491,6 @@
     document.getElementById('saveTaskBtn').addEventListener('click', () => {
       const s = state.spheres.find(x => x.id === activeSphereId);
       if (!s) return;
-      const newName = document.getElementById('renameSphere').value.trim();
-      if (newName) s.name = newName.slice(0, 24);
-
       const text = document.getElementById('taskText').value.trim();
       const why = document.getElementById('taskWhy').value.trim();
 

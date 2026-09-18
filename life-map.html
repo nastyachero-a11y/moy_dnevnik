@@ -4,23 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Карта жизни — Мой дорогой дневник</title>
+  <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
+      --bg1: #1a3a9c;
+      --bg2: #1e6fd9;
+      --bg3: #2bb673;
       --lime: #a8ff3e;
-      --blue: #1e4fd6;
-      --green: #2bb673;
-      --text: #1a1a2e;
+      --ink: #1a1a2e;
       --soft: #5a6280;
+      --card: #fffef9;
+      --line: rgba(255,255,255,0.4);
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
       background: linear-gradient(165deg, #1a3a9c 0%, #1e6fd9 35%, #2bb673 75%, #3dd68c 100%);
       background-attachment: fixed;
-      color: white;
+      color: #fff;
       min-height: 100vh;
       line-height: 1.45;
     }
@@ -28,51 +32,56 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 18px 20px;
-      max-width: 980px;
+      max-width: 1100px;
       margin: 0 auto;
+      padding: 16px 18px;
     }
     .back-btn {
       background: rgba(255,255,255,0.15);
       border: 1px solid rgba(255,255,255,0.25);
-      color: white;
+      color: #fff;
       padding: 9px 14px;
       border-radius: 11px;
-      font-family: inherit;
-      font-size: 0.88rem;
-      font-weight: 600;
+      font: 600 0.88rem inherit;
       text-decoration: none;
-      transition: background 0.2s;
     }
     .back-btn:hover { background: rgba(255,255,255,0.25); }
-    .page-title { font-size: 1.1rem; font-weight: 800; }
+    .page-title { font-size: 1.05rem; font-weight: 800; }
+
     main {
-      max-width: 980px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 4px 16px 56px;
+      padding: 4px 14px 48px;
     }
     .intro {
       text-align: center;
-      margin-bottom: 6px;
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 600;
       color: rgba(255,255,255,0.92);
+      margin-bottom: 4px;
     }
     .hint {
       text-align: center;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: rgba(255,255,255,0.7);
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 1fr 56px;
+      gap: 10px;
+      align-items: stretch;
+    }
+
     .map-wrap {
       position: relative;
       width: 100%;
-      height: min(72vw, 520px);
-      min-height: 380px;
-      margin: 0 auto 20px;
+      min-height: 420px;
+      height: min(68vw, 540px);
       border-radius: 20px;
-      background: rgba(0,0,0,0.12);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.14);
       overflow: hidden;
     }
     .map-svg {
@@ -84,118 +93,164 @@
     }
     .map-svg path {
       fill: none;
-      stroke: rgba(255,255,255,0.35);
+      stroke: var(--line);
       stroke-width: 2;
       stroke-linecap: round;
-      stroke-dasharray: 6 5;
-      transition: stroke 0.35s, stroke-width 0.35s;
+      stroke-dasharray: 5 5;
     }
-    .map-svg path.filled {
+    .map-svg path.has-tasks {
       stroke: rgba(168,255,62,0.75);
-      stroke-width: 2.4;
       stroke-dasharray: none;
+      stroke-width: 2.4;
     }
+
     .node {
       position: absolute;
       transform: translate(-50%, -50%);
+      z-index: 3;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 64px;
+      min-height: 64px;
+    }
+    .node-bubble {
+      position: relative;
+      min-width: 72px;
+      max-width: 110px;
+      padding: 12px 10px;
+      border-radius: 18px;
+      background: var(--card);
+      color: var(--ink);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.2;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.16);
+      border: 2px solid transparent;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .node:hover .node-bubble { transform: scale(1.06); }
+    .node.has-tasks .node-bubble {
+      border-color: #7ed957;
+      background: #f3ffe8;
+    }
+    .node.empty-warn .node-bubble {
+      border-color: rgba(255, 180, 80, 0.7);
+    }
+    .node.center {
+      cursor: default;
+      z-index: 4;
+    }
+    .node.center .node-bubble {
+      min-width: 96px;
+      max-width: 120px;
+      padding: 18px 14px;
+      font-size: 0.9rem;
+      background: linear-gradient(145deg, #1e4fd6, #2bb673);
+      color: #fff;
+      border: 3px solid rgba(255,255,255,0.45);
+      box-shadow: 0 12px 32px rgba(30,79,214,0.35);
+    }
+    .node.center:hover .node-bubble { transform: none; }
+    .node-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 5px;
+      border-radius: 11px;
+      background: #1e4fd6;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .node-badge.done-all { background: #2bb673; }
+
+    .side-plus {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      cursor: pointer;
-      z-index: 3;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-      min-width: 56px;
-      min-height: 56px;
+      gap: 8px;
     }
-    .node-core {
-      width: 64px;
-      height: 64px;
+    .plus-btn {
+      width: 52px;
+      height: 52px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.92);
-      color: var(--blue);
-      font-weight: 800;
-      font-size: 0.72rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      line-height: 1.15;
-      padding: 6px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-      border: 2px solid transparent;
-      transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s, background 0.25s;
-    }
-    .node:hover .node-core {
-      transform: scale(1.08);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.25);
-    }
-    .node.filled .node-core {
-      background: linear-gradient(145deg, #fff, #e8ffe0);
-      border-color: var(--lime);
-    }
-    .node.center .node-core {
-      width: 88px;
-      height: 88px;
-      font-size: 0.95rem;
+      border: none;
       background: linear-gradient(145deg, #1e4fd6, #2bb673);
-      color: white;
-      border: 3px solid rgba(255,255,255,0.5);
-      box-shadow: 0 12px 36px rgba(30,79,214,0.35);
-      cursor: default;
-    }
-    .node.center:hover .node-core { transform: none; }
-    .node-score {
-      position: absolute;
-      top: -4px;
-      right: -4px;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: var(--lime);
-      color: #123;
-      font-size: 0.72rem;
-      font-weight: 800;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-    .node.filled .node-score { display: flex; }
-    .node-label {
-      font-size: 0.78rem;
+      color: #fff;
+      font-size: 1.8rem;
       font-weight: 700;
-      color: rgba(255,255,255,0.9);
-      text-shadow: 0 1px 6px rgba(0,0,0,0.35);
-      max-width: 90px;
-      text-align: center;
-      line-height: 1.2;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(30,79,214,0.35);
+      line-height: 1;
+      transition: transform 0.2s;
     }
-    .node.center .node-label { display: none; }
+    .plus-btn:hover { transform: scale(1.08); }
+    .plus-label {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.8);
+      letter-spacing: 0.04em;
+    }
 
-    .summary {
-      background: rgba(255,255,255,0.92);
+    .balance {
+      margin-top: 16px;
+      background: rgba(255,255,255,0.94);
+      color: var(--ink);
       border-radius: 16px;
-      padding: 18px 20px;
-      color: var(--text);
-      text-align: center;
+      padding: 16px 18px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.1);
     }
-    .summary .count {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--blue);
-      margin-bottom: 6px;
+    .balance h3 {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #1e4fd6;
+      margin-bottom: 10px;
     }
-    .summary .msg {
-      font-size: 0.95rem;
+    .balance-bars { display: flex; flex-direction: column; gap: 8px; }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 110px 1fr 28px;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .bar-track {
+      height: 10px;
+      border-radius: 6px;
+      background: #eef1f7;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      background: linear-gradient(90deg, #1e4fd6, #2bb673);
+      min-width: 0;
+      transition: width 0.35s;
+    }
+    .bar-fill.warn { background: linear-gradient(90deg, #f0a020, #f5c86a); }
+    .bar-fill.empty { background: #d8dde8; }
+    .balance-note {
+      margin-top: 12px;
+      font-size: 0.82rem;
       font-weight: 600;
       color: var(--soft);
+      line-height: 1.4;
     }
-    .summary .msg strong { color: var(--green); }
+    .balance-note strong { color: #c47a10; }
 
     .save-status {
       text-align: center;
@@ -204,227 +259,347 @@
       font-weight: 600;
       color: var(--lime);
       opacity: 0;
-      transition: opacity 0.3s;
       min-height: 20px;
+      transition: opacity 0.3s;
     }
     .save-status.show { opacity: 1; }
 
-    /* Modal */
+    /* Modals */
     .overlay {
       position: fixed;
       inset: 0;
-      background: rgba(5,12,25,0.55);
+      background: rgba(8,16,30,0.55);
       backdrop-filter: blur(6px);
-      z-index: 50;
+      z-index: 40;
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 14px;
     }
     .overlay.show { display: flex; }
     .modal {
-      background: #fff;
-      border-radius: 20px;
-      padding: 24px 20px;
       width: 100%;
-      max-width: 420px;
-      max-height: 90vh;
+      max-width: 460px;
+      max-height: 92vh;
       overflow-y: auto;
-      color: var(--text);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      animation: pop 0.28s ease;
+      background: var(--card);
+      color: var(--ink);
+      border-radius: 20px;
+      padding: 22px 18px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+      animation: pop 0.25s ease;
     }
     @keyframes pop {
-      from { opacity: 0; transform: scale(0.94) translateY(10px); }
+      from { opacity: 0; transform: scale(0.95) translateY(8px); }
       to { opacity: 1; transform: scale(1) translateY(0); }
     }
     .modal-head {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 14px;
     }
-    .modal-title {
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: var(--blue);
+    .modal-title-wrap { flex: 1; }
+    .modal-title-input {
+      width: 100%;
+      border: 1.5px solid #e4e8f0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font: 800 1.05rem inherit;
+      color: #1e4fd6;
+      background: #fff;
+      outline: none;
+    }
+    .modal-title-input:focus {
+      border-color: #2bb673;
+      box-shadow: 0 0 0 3px rgba(43,182,115,0.12);
     }
     .modal-close {
-      width: 34px;
-      height: 34px;
-      border: none;
-      border-radius: 50%;
+      width: 34px; height: 34px;
+      border: none; border-radius: 50%;
       background: rgba(0,0,0,0.06);
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       cursor: pointer;
       color: var(--soft);
+      flex-shrink: 0;
     }
-    .field { margin-bottom: 14px; }
+    .field { margin-bottom: 12px; }
     .field label {
       display: block;
-      font-size: 0.8rem;
-      font-weight: 600;
+      font-size: 0.78rem;
+      font-weight: 700;
       color: var(--soft);
       margin-bottom: 6px;
     }
-    .field textarea, .field input {
+    .field input, .field textarea {
       width: 100%;
-      border: 1.5px solid #e0e4f0;
+      border: 1.5px solid #e4e8f0;
       border-radius: 12px;
-      padding: 11px 13px;
-      font-family: inherit;
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: var(--text);
+      padding: 11px 12px;
+      font: 500 0.9rem inherit;
+      color: var(--ink);
+      background: #fff;
       outline: none;
-      background: #fafbff;
       resize: vertical;
     }
-    .field textarea:focus, .field input:focus {
-      border-color: var(--green);
+    .field textarea { min-height: 64px; }
+    .field input:focus, .field textarea:focus {
+      border-color: #2bb673;
       box-shadow: 0 0 0 3px rgba(43,182,115,0.12);
     }
-    .field textarea { min-height: 68px; }
-    .score-row {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
+    .hint-field {
+      font-size: 0.75rem;
+      color: #8a90a5;
+      margin-top: 4px;
+      font-weight: 500;
     }
-    .score-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      border: 1.5px solid #e0e4f0;
-      background: #fafbff;
-      font-family: inherit;
-      font-weight: 700;
+
+    .tasks { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+    .task {
+      background: #fff;
+      border: 1.5px solid #e8ecf4;
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: grid;
+      grid-template-columns: 24px 1fr auto;
+      gap: 8px;
+      align-items: start;
+    }
+    .task.done {
+      background: #f3f6f2;
+      border-color: #cfe8c4;
+    }
+    .task.done .task-text {
+      text-decoration: line-through;
+      color: #8a93a8;
+    }
+    .task-check {
+      width: 20px; height: 20px;
+      margin-top: 2px;
+      accent-color: #2bb673;
+      cursor: pointer;
+    }
+    .task-text { font-size: 0.86rem; font-weight: 600; }
+    .task-why {
+      font-size: 0.75rem;
+      color: var(--soft);
+      font-weight: 500;
+      margin-top: 4px;
+    }
+    .task-actions { display: flex; gap: 4px; }
+    .task-actions button {
+      border: none;
+      background: rgba(0,0,0,0.05);
+      border-radius: 8px;
+      width: 28px; height: 28px;
+      cursor: pointer;
       font-size: 0.85rem;
       color: var(--soft);
-      cursor: pointer;
-      transition: all 0.15s;
     }
-    .score-btn:hover { border-color: var(--green); }
-    .score-btn.active {
-      background: linear-gradient(135deg, #1e4fd6, #2bb673);
-      color: white;
-      border-color: transparent;
-    }
-    .modal-save {
-      width: 100%;
-      margin-top: 6px;
-      padding: 13px;
+
+    .btn-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .btn {
       border: none;
       border-radius: 12px;
-      background: linear-gradient(135deg, #1e4fd6, #2bb673);
-      color: white;
-      font-family: inherit;
-      font-size: 0.95rem;
-      font-weight: 700;
+      padding: 12px 16px;
+      font: 700 0.9rem inherit;
       cursor: pointer;
+      flex: 1;
+      min-width: 120px;
     }
-    .modal-save:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: linear-gradient(135deg, #1e4fd6, #2bb673);
+      color: #fff;
+    }
+    .btn-ghost {
+      background: rgba(0,0,0,0.06);
+      color: var(--soft);
+    }
+    .btn-danger {
+      background: rgba(220,70,70,0.12);
+      color: #c04040;
+    }
 
-    @media (max-width: 600px) {
-      .map-wrap { min-height: 460px; height: 500px; }
-      .node {
-        min-width: 72px;
-        min-height: 72px;
-        padding: 8px;
+    /* Add sphere modal presets */
+    .presets {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .preset {
+      border: 1.5px solid #e4e8f0;
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px 10px;
+      font: 700 0.82rem inherit;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .preset:hover, .preset.selected {
+      border-color: #2bb673;
+      background: #f3ffe8;
+    }
+    .preset:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .empty-map-hint {
+      position: absolute;
+      left: 50%;
+      top: 72%;
+      transform: translateX(-50%);
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.85);
+      max-width: 240px;
+      z-index: 2;
+      pointer-events: none;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.25);
+    }
+
+    @media (max-width: 700px) {
+      .workspace { grid-template-columns: 1fr; }
+      .side-plus {
+        flex-direction: row;
+        justify-content: center;
+        padding: 4px 0 8px;
       }
-      .node-core {
-        width: 62px;
-        height: 62px;
-        font-size: 0.68rem;
-        pointer-events: auto;
+      .plus-label {
+        writing-mode: horizontal-tb;
+        transform: none;
       }
-      .node.center .node-core { width: 80px; height: 80px; font-size: 0.85rem; }
-      .node-label { font-size: 0.72rem; max-width: 80px; }
-      .add-sphere-btn { margin-top: 8px; }
+      .map-wrap { height: 460px; min-height: 440px; }
+      .node-bubble { min-width: 64px; max-width: 92px; font-size: 0.68rem; padding: 10px 8px; }
+      .node.center .node-bubble { min-width: 84px; font-size: 0.82rem; }
+      .bar-row { grid-template-columns: 90px 1fr 24px; font-size: 0.72rem; }
+      .presets { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <div class="top-bar">
-    <a href="index.html" class="back-btn">← Назад</a>
+    <a class="back-btn" href="index.html">← Назад</a>
     <div class="page-title">Карта жизни</div>
     <div style="width:86px"></div>
   </div>
 
   <main>
-    <p class="intro">В центре — твоя жизнь. Ветки — сферы, которые её составляют</p>
-    <p class="hint">Нажми на сферу, чтобы оценить и заполнить</p>
+    <p class="intro">Mind map твоей жизни — от центра к сферам и целям</p>
+    <p class="hint">Нажми «+», чтобы добавить сферу · Кликни сферу, чтобы вести цели</p>
 
-    <div class="map-wrap" id="map">
-      <svg class="map-svg" id="branches" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
-      <!-- nodes injected -->
+    <div class="workspace">
+      <div class="map-wrap" id="map">
+        <svg class="map-svg" id="branches" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+        <div class="empty-map-hint" id="emptyHint">Пока только «Моя Жизнь».<br>Добавь первую сферу справа →</div>
+      </div>
+      <div class="side-plus">
+        <button type="button" class="plus-btn" id="plusBtn" title="Добавить сферу">+</button>
+        <span class="plus-label">сфера</span>
+      </div>
     </div>
 
-    <button type="button" class="add-sphere-btn" id="addSphereBtn">+ Добавить свою сферу</button>
-
-    <div class="summary">
-      <div class="msg" id="summaryMsg">Начни с любой ветки — карта соберётся сама</div>
+    <div class="balance" id="balanceBlock" hidden>
+      <h3>Баланс внимания</h3>
+      <div class="balance-bars" id="balanceBars"></div>
+      <div class="balance-note" id="balanceNote"></div>
     </div>
     <div class="save-status" id="saveStatus">Сохранено ✓</div>
   </main>
 
-  <div class="overlay" id="overlay">
+  <!-- Add sphere -->
+  <div class="overlay" id="addOverlay">
     <div class="modal">
       <div class="modal-head">
-        <div class="modal-title" id="modalTitle">Сфера</div>
-        <button class="modal-close" id="modalClose" type="button">×</button>
+        <div class="modal-title-wrap">
+          <div style="font-size:1.05rem;font-weight:800;color:#1e4fd6;margin-bottom:4px;">Добавить сферу</div>
+          <div style="font-size:0.8rem;color:#5a6280;font-weight:600;">Выбери готовую или придумай свою</div>
+        </div>
+        <button type="button" class="modal-close" data-close="addOverlay">×</button>
+      </div>
+      <div class="presets" id="presets"></div>
+      <div class="field">
+        <label>Или своё название</label>
+        <input type="text" id="customName" placeholder="Например: Творчество" maxlength="28">
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn btn-ghost" data-close="addOverlay">Отмена</button>
+        <button type="button" class="btn btn-primary" id="confirmAdd">Добавить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sphere detail -->
+  <div class="overlay" id="sphereOverlay">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-title-wrap">
+          <input class="modal-title-input" id="sphereName" maxlength="28" placeholder="Название сферы">
+        </div>
+        <button type="button" class="modal-close" data-close="sphereOverlay">×</button>
+      </div>
+
+      <div class="field">
+        <label>Новая цель / задача</label>
+        <input type="text" id="taskText" placeholder="Что конкретно хочу сделать">
       </div>
       <div class="field">
-        <label>Оценка сейчас (1–10)</label>
-        <div class="score-row" id="scoreRow"></div>
+        <label>Как это улучшит качество моей жизни? *</label>
+        <textarea id="taskWhy" placeholder="Зачем мне это — своими словами"></textarea>
+        <div class="hint-field">Обязательно: помогает отсеять навязанные «надо»</div>
       </div>
-      <div class="field">
-        <label>Что есть сейчас</label>
-        <textarea id="f-now" placeholder="Как обстоят дела в этой сфере..."></textarea>
+      <div class="btn-row">
+        <button type="button" class="btn btn-primary" id="addTaskBtn">Добавить цель</button>
       </div>
-      <div class="field">
-        <label>Чего не хватает</label>
-        <textarea id="f-need" placeholder="Что хочется усилить или изменить..."></textarea>
+
+      <div style="margin-top:16px;font-size:0.8rem;font-weight:700;color:#5a6280;">Цели в этой сфере</div>
+      <div class="tasks" id="tasksList"></div>
+
+      <div class="btn-row" style="margin-top:16px;">
+        <button type="button" class="btn btn-danger" id="deleteSphereBtn">Удалить сферу</button>
+        <button type="button" class="btn btn-primary" id="saveSphereBtn">Сохранить</button>
       </div>
-      <div class="field">
-        <label>Один маленький шаг</label>
-        <textarea id="f-step" placeholder="Что могу сделать на этой неделе..."></textarea>
-      </div>
-      <button class="modal-save" id="modalSave" type="button">Сохранить</button>
     </div>
   </div>
 
   <script>
-    const STORAGE_KEY = 'diary_life_map_v2';
+    const STORAGE_KEY = 'diary_life_mindmap_v1';
     const CENTER = { x: 50, y: 50 };
 
-    const DEFAULTS = [
-      { id: 'health',    name: 'Здоровье',  x: 50, y: 12 },
-      { id: 'relations', name: 'Отношения', x: 82, y: 26 },
-      { id: 'work',      name: 'Работа',    x: 88, y: 55 },
-      { id: 'money',     name: 'Деньги',    x: 72, y: 82 },
-      { id: 'rest',      name: 'Отдых',     x: 28, y: 82 },
-      { id: 'growth',    name: 'Развитие',  x: 12, y: 55 },
-      { id: 'home',      name: 'Дом',       x: 18, y: 26 },
-      { id: 'meaning',   name: 'Смысл',     x: 50, y: 90 }
+    const PRESETS = [
+      'Здоровье',
+      'Деньги',
+      'Карьера / Работа',
+      'Личная жизнь',
+      'Дух & Психика',
+      'Отдых & Развлечения',
+      'Развитие & Обучение',
+      'Друзья & Окружение'
     ];
 
-    let spheres = []; // {id, name, x, y, custom}
-    let data = {};    // id -> {score, now, need, step}
-    let currentId = null;
-    let currentScore = 0;
-    let nextCustom = 1;
+    const PASTELS = [
+      '#ffe8e0', '#e8f4ff', '#e8ffe8', '#fff5e0',
+      '#f0e8ff', '#e0fff8', '#ffe0f0', '#f5f0e8'
+    ];
 
-    function emptyData() {
-      return { score: 0, now: '', need: '', step: '' };
-    }
+    let state = {
+      spheres: [] // { id, name, x, y, color, tasks: [{id, text, why, done}] }
+    };
+    let selectedPreset = null;
+    let currentSphereId = null;
+    let nextId = 1;
 
-    function isFilled(s) {
-      if (!s) return false;
-      return s.score > 0 || (s.now && s.now.trim()) || (s.need && s.need.trim()) || (s.step && s.step.trim());
+    function uid(prefix) {
+      return prefix + '_' + (nextId++) + '_' + Date.now().toString(36);
     }
 
     function save() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ spheres, data, nextCustom }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ state, nextId }));
       const el = document.getElementById('saveStatus');
       el.classList.add('show');
       setTimeout(() => el.classList.remove('show'), 1400);
@@ -433,227 +608,319 @@
     function load() {
       try {
         const raw = JSON.parse(localStorage.getItem(STORAGE_KEY));
-        if (raw && Array.isArray(raw.spheres) && raw.spheres.length) {
-          spheres = raw.spheres;
-          data = raw.data || {};
-          nextCustom = raw.nextCustom || 1;
-        } else {
-          // migrate old format or defaults
-          spheres = DEFAULTS.map(s => ({ ...s, custom: false }));
-          data = {};
-          spheres.forEach(s => { data[s.id] = emptyData(); });
-          try {
-            const old = JSON.parse(localStorage.getItem('diary_life_map_v1'));
-            if (old && old.spheres) {
-              Object.keys(old.spheres).forEach(id => {
-                if (data[id]) data[id] = { ...data[id], ...old.spheres[id] };
-              });
-            }
-          } catch(e) {}
+        if (raw && raw.state && Array.isArray(raw.state.spheres)) {
+          state = raw.state;
+          nextId = raw.nextId || 1;
         }
-        spheres.forEach(s => {
-          if (!data[s.id]) data[s.id] = emptyData();
-        });
-      } catch(e) {
-        spheres = DEFAULTS.map(s => ({ ...s, custom: false }));
-        data = {};
-        spheres.forEach(s => { data[s.id] = emptyData(); });
-      }
+      } catch (e) {}
     }
 
     function branchPath(x1, y1, x2, y2) {
       const dx = x2 - x1, dy = y2 - y1;
-      const cx1 = x1 + dx * 0.35;
-      const cy1 = y1 + dy * 0.08;
-      const cx2 = x1 + dx * 0.65;
-      const cy2 = y2 - dy * 0.08;
+      const cx1 = x1 + dx * 0.4;
+      const cy1 = y1 + dy * 0.1;
+      const cx2 = x1 + dx * 0.7;
+      const cy2 = y2 - dy * 0.1;
       return `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
     }
 
-    function layoutCustomPositions() {
-      // place custom spheres on free angles
-      const customs = spheres.filter(s => s.custom);
-      customs.forEach((s, i) => {
-        if (s.x && s.y && (s.x !== 50 || s.y !== 50)) return;
-        const angle = (Math.PI * 2 * i) / Math.max(customs.length, 1) + 0.4;
-        const r = 34 + (i % 3) * 4;
+    function placeNewSphere(index) {
+      const n = Math.max(state.spheres.length, 1);
+      const angle = -Math.PI / 2 + (Math.PI * 2 * index) / Math.max(n + 1, 8);
+      const r = 34 + (index % 3) * 3;
+      return {
+        x: +(50 + Math.cos(angle) * r).toFixed(1),
+        y: +(50 + Math.sin(angle) * r).toFixed(1)
+      };
+    }
+
+    function redistribute() {
+      const n = state.spheres.length;
+      if (!n) return;
+      state.spheres.forEach((s, i) => {
+        const angle = -Math.PI / 2 + (Math.PI * 2 * i) / n;
+        const r = n <= 4 ? 32 : (n <= 8 ? 36 : 38);
         s.x = +(50 + Math.cos(angle) * r).toFixed(1);
         s.y = +(50 + Math.sin(angle) * r).toFixed(1);
       });
     }
 
-    function drawBranches() {
-      const svg = document.getElementById('branches');
-      svg.innerHTML = '';
-      spheres.forEach(s => {
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', branchPath(CENTER.x, CENTER.y, s.x, s.y));
-        if (isFilled(data[s.id])) path.classList.add('filled');
-        svg.appendChild(path);
+    function openOverlay(id) {
+      document.getElementById(id).classList.add('show');
+    }
+    function closeOverlay(id) {
+      document.getElementById(id).classList.remove('show');
+    }
+
+    document.querySelectorAll('[data-close]').forEach(btn => {
+      btn.addEventListener('click', () => closeOverlay(btn.getAttribute('data-close')));
+    });
+    document.querySelectorAll('.overlay').forEach(ov => {
+      ov.addEventListener('click', e => {
+        if (e.target === ov) ov.classList.remove('show');
+      });
+    });
+
+    function renderPresets() {
+      const box = document.getElementById('presets');
+      box.innerHTML = '';
+      const used = new Set(state.spheres.map(s => s.name.toLowerCase()));
+      PRESETS.forEach(name => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'preset' + (selectedPreset === name ? ' selected' : '');
+        b.textContent = name;
+        if (used.has(name.toLowerCase())) {
+          b.disabled = true;
+          b.textContent = name + ' ✓';
+        }
+        b.addEventListener('click', () => {
+          selectedPreset = name;
+          document.getElementById('customName').value = '';
+          renderPresets();
+        });
+        box.appendChild(b);
       });
     }
 
-    function openModal(id) {
-      currentId = id;
-      const meta = spheres.find(s => s.id === id);
-      if (!meta) return;
-      const d = data[id] || emptyData();
-      currentScore = d.score || 0;
-      document.getElementById('modalTitle').textContent = meta.name;
-      document.getElementById('f-now').value = d.now || '';
-      document.getElementById('f-need').value = d.need || '';
-      document.getElementById('f-step').value = d.step || '';
-      const row = document.getElementById('scoreRow');
-      row.innerHTML = '';
-      for (let i = 1; i <= 10; i++) {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'score-btn' + (i === currentScore ? ' active' : '');
-        b.textContent = i;
-        b.addEventListener('click', () => {
-          currentScore = i;
-          row.querySelectorAll('.score-btn').forEach(x => x.classList.remove('active'));
-          b.classList.add('active');
-        });
-        row.appendChild(b);
+    document.getElementById('plusBtn').addEventListener('click', () => {
+      selectedPreset = null;
+      document.getElementById('customName').value = '';
+      renderPresets();
+      openOverlay('addOverlay');
+    });
+
+    document.getElementById('customName').addEventListener('input', () => {
+      selectedPreset = null;
+      renderPresets();
+    });
+
+    document.getElementById('confirmAdd').addEventListener('click', () => {
+      const custom = document.getElementById('customName').value.trim();
+      const name = custom || selectedPreset;
+      if (!name) {
+        alert('Выбери сферу или введи своё название');
+        return;
       }
-      document.getElementById('overlay').classList.add('show');
+      if (state.spheres.some(s => s.name.toLowerCase() === name.toLowerCase())) {
+        alert('Такая сфера уже есть');
+        return;
+      }
+      const pos = placeNewSphere(state.spheres.length);
+      state.spheres.push({
+        id: uid('sp'),
+        name: name.slice(0, 28),
+        x: pos.x,
+        y: pos.y,
+        color: PASTELS[state.spheres.length % PASTELS.length],
+        tasks: []
+      });
+      redistribute();
+      save();
+      closeOverlay('addOverlay');
+      render();
+    });
+
+    function openSphere(id) {
+      currentSphereId = id;
+      const s = state.spheres.find(x => x.id === id);
+      if (!s) return;
+      document.getElementById('sphereName').value = s.name;
+      document.getElementById('taskText').value = '';
+      document.getElementById('taskWhy').value = '';
+      renderTasks();
+      openOverlay('sphereOverlay');
     }
 
-    function closeModal() {
-      document.getElementById('overlay').classList.remove('show');
-      currentId = null;
+    function renderTasks() {
+      const s = state.spheres.find(x => x.id === currentSphereId);
+      const list = document.getElementById('tasksList');
+      list.innerHTML = '';
+      if (!s || !s.tasks.length) {
+        list.innerHTML = '<div style="font-size:0.82rem;color:#8a90a5;font-weight:600;padding:8px 0;">Пока нет целей — добавь первую</div>';
+        return;
+      }
+      s.tasks.forEach(t => {
+        const row = document.createElement('div');
+        row.className = 'task' + (t.done ? ' done' : '');
+        row.innerHTML = `
+          <input type="checkbox" class="task-check" ${t.done ? 'checked' : ''} data-toggle="${t.id}">
+          <div>
+            <div class="task-text">${escapeHtml(t.text)}</div>
+            <div class="task-why">${escapeHtml(t.why || '')}</div>
+          </div>
+          <div class="task-actions">
+            <button type="button" data-edit="${t.id}" title="Изменить">✎</button>
+            <button type="button" data-del="${t.id}" title="Удалить">×</button>
+          </div>
+        `;
+        list.appendChild(row);
+      });
+
+      list.querySelectorAll('[data-toggle]').forEach(el => {
+        el.addEventListener('change', () => {
+          const t = s.tasks.find(x => x.id === el.getAttribute('data-toggle'));
+          if (t) { t.done = el.checked; save(); renderTasks(); render(); }
+        });
+      });
+      list.querySelectorAll('[data-del]').forEach(el => {
+        el.addEventListener('click', () => {
+          s.tasks = s.tasks.filter(x => x.id !== el.getAttribute('data-del'));
+          save(); renderTasks(); render();
+        });
+      });
+      list.querySelectorAll('[data-edit]').forEach(el => {
+        el.addEventListener('click', () => {
+          const t = s.tasks.find(x => x.id === el.getAttribute('data-edit'));
+          if (!t) return;
+          const text = prompt('Цель:', t.text);
+          if (text === null) return;
+          const why = prompt('Как улучшит жизнь:', t.why || '');
+          if (why === null) return;
+          if (!text.trim() || !why.trim()) {
+            alert('Оба поля нужны');
+            return;
+          }
+          t.text = text.trim();
+          t.why = why.trim();
+          save(); renderTasks();
+        });
+      });
     }
 
-    function renderNodes() {
-      layoutCustomPositions();
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    document.getElementById('addTaskBtn').addEventListener('click', () => {
+      const s = state.spheres.find(x => x.id === currentSphereId);
+      if (!s) return;
+      const text = document.getElementById('taskText').value.trim();
+      const why = document.getElementById('taskWhy').value.trim();
+      if (!text) { alert('Напиши цель'); return; }
+      if (!why) { alert('Укажи, как это улучшит качество жизни'); return; }
+      s.tasks.push({ id: uid('task'), text, why, done: false });
+      document.getElementById('taskText').value = '';
+      document.getElementById('taskWhy').value = '';
+      save();
+      renderTasks();
+      render();
+    });
+
+    document.getElementById('saveSphereBtn').addEventListener('click', () => {
+      const s = state.spheres.find(x => x.id === currentSphereId);
+      if (!s) return;
+      const name = document.getElementById('sphereName').value.trim();
+      if (!name) { alert('Название не может быть пустым'); return; }
+      s.name = name.slice(0, 28);
+      save();
+      closeOverlay('sphereOverlay');
+      render();
+    });
+
+    document.getElementById('deleteSphereBtn').addEventListener('click', () => {
+      if (!confirm('Удалить эту сферу и все её цели?')) return;
+      state.spheres = state.spheres.filter(x => x.id !== currentSphereId);
+      redistribute();
+      save();
+      closeOverlay('sphereOverlay');
+      render();
+    });
+
+    function render() {
       const map = document.getElementById('map');
       map.querySelectorAll('.node').forEach(n => n.remove());
+      const svg = document.getElementById('branches');
+      svg.innerHTML = '';
 
+      // center
       const center = document.createElement('div');
       center.className = 'node center';
       center.style.left = CENTER.x + '%';
       center.style.top = CENTER.y + '%';
-      center.innerHTML = '<div class="node-core">Жизнь</div>';
+      center.innerHTML = '<div class="node-bubble">Моя Жизнь</div>';
       map.appendChild(center);
 
-      const isMobile = window.matchMedia('(max-width: 600px)').matches;
+      const emptyHint = document.getElementById('emptyHint');
+      emptyHint.style.display = state.spheres.length ? 'none' : 'block';
 
-      spheres.forEach(s => {
-        const d = data[s.id] || emptyData();
+      state.spheres.forEach(s => {
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', branchPath(CENTER.x, CENTER.y, s.x, s.y));
+        if (s.tasks && s.tasks.length) path.classList.add('has-tasks');
+        svg.appendChild(path);
+
+        const total = s.tasks.length;
+        const done = s.tasks.filter(t => t.done).length;
         const el = document.createElement('div');
-        el.className = 'node' + (isFilled(d) ? ' filled' : '') + (s.custom ? ' custom' : '');
+        el.className = 'node' + (total ? ' has-tasks' : ' empty-warn');
         el.style.left = s.x + '%';
         el.style.top = s.y + '%';
-        el.dataset.id = s.id;
-
-        const delBtn = s.custom
-          ? `<button type="button" class="node-delete${isMobile ? ' show-mobile' : ''}" data-del="${s.id}" aria-label="Удалить">×</button>`
+        const badge = total
+          ? `<span class="node-badge${done === total ? ' done-all' : ''}">${done}/${total}</span>`
           : '';
+        el.innerHTML = `<div class="node-bubble" style="background:${s.color || '#fffef9'}">${escapeHtml(s.name)}${badge}</div>`;
 
-        el.innerHTML = `
-          <div class="node-core" style="position:relative">
-            ${delBtn}
-            ${s.name}
-            <span class="node-score">${d.score || ''}</span>
-          </div>
-        `;
-
-        // reliable mobile + desktop open
         const open = (e) => {
-          if (e.target.closest && e.target.closest('[data-del]')) return;
           e.preventDefault();
           e.stopPropagation();
-          openModal(s.id);
+          openSphere(s.id);
         };
         el.addEventListener('click', open);
-        el.addEventListener('touchend', (e) => {
-          if (e.target.closest && e.target.closest('[data-del]')) return;
-          e.preventDefault();
-          openModal(s.id);
-        }, { passive: false });
-
-        const del = el.querySelector('[data-del]');
-        if (del) {
-          const remove = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (!confirm('Удалить сферу «' + s.name + '»?')) return;
-            spheres = spheres.filter(x => x.id !== s.id);
-            delete data[s.id];
-            save();
-            renderNodes();
-          };
-          del.addEventListener('click', remove);
-          del.addEventListener('touchend', remove, { passive: false });
-        }
-
+        el.addEventListener('touchend', open, { passive: false });
         map.appendChild(el);
       });
 
-      drawBranches();
-      updateSummary();
+      renderBalance();
     }
 
-    function updateSummary() {
-      const scored = spheres
-        .map(s => ({ name: s.name, score: (data[s.id] && data[s.id].score) || 0 }))
-        .filter(s => s.score > 0)
-        .sort((a, b) => a.score - b.score);
-      const filled = spheres.filter(s => isFilled(data[s.id])).length;
-      const msg = document.getElementById('summaryMsg');
-      if (filled === 0) {
-        msg.textContent = 'Начни с любой ветки — карта соберётся сама';
-      } else if (scored.length && scored[0].score <= 5) {
-        msg.innerHTML = 'Сейчас мягче всего просится внимание: <strong>' + scored[0].name + '</strong>';
-      } else if (filled >= spheres.length) {
-        msg.textContent = 'Твоя карта собрана. Ты видишь, где сила и где опора нужна';
-      } else {
-        msg.textContent = 'Карта растёт. Можно добавить свою сферу или заполнить остальные';
+    function renderBalance() {
+      const block = document.getElementById('balanceBlock');
+      const bars = document.getElementById('balanceBars');
+      const note = document.getElementById('balanceNote');
+      if (!state.spheres.length) {
+        block.hidden = true;
+        return;
       }
-    }
-
-    document.getElementById('modalClose').addEventListener('click', closeModal);
-    document.getElementById('overlay').addEventListener('click', e => {
-      if (e.target.id === 'overlay') closeModal();
-    });
-    document.getElementById('modalSave').addEventListener('click', () => {
-      if (!currentId) return;
-      data[currentId] = {
-        score: currentScore,
-        now: document.getElementById('f-now').value,
-        need: document.getElementById('f-need').value,
-        step: document.getElementById('f-step').value
-      };
-      save();
-      renderNodes();
-      closeModal();
-    });
-
-    document.getElementById('addSphereBtn').addEventListener('click', () => {
-      const name = prompt('Название новой сферы:', 'Моя сфера');
-      if (!name || !name.trim()) return;
-      const id = 'custom_' + (nextCustom++);
-      const n = spheres.filter(s => s.custom).length;
-      const angle = (Math.PI * 2 * n) / 8 + 0.5;
-      const r = 36;
-      spheres.push({
-        id,
-        name: name.trim().slice(0, 18),
-        x: +(50 + Math.cos(angle) * r).toFixed(1),
-        y: +(50 + Math.sin(angle) * r).toFixed(1),
-        custom: true
+      block.hidden = false;
+      const max = Math.max(1, ...state.spheres.map(s => s.tasks.length));
+      bars.innerHTML = '';
+      state.spheres.forEach(s => {
+        const n = s.tasks.length;
+        const pct = Math.round((n / max) * 100);
+        const row = document.createElement('div');
+        row.className = 'bar-row';
+        const cls = n === 0 ? 'empty' : (n >= max && max >= 3 ? 'warn' : '');
+        row.innerHTML = `
+          <div>${escapeHtml(s.name)}</div>
+          <div class="bar-track"><div class="bar-fill ${cls}" style="width:${n ? Math.max(pct, 8) : 0}%"></div></div>
+          <div>${n}</div>
+        `;
+        bars.appendChild(row);
       });
-      data[id] = emptyData();
-      save();
-      renderNodes();
-      // open for fill
-      setTimeout(() => openModal(id), 200);
-    });
+
+      const empty = state.spheres.filter(s => !s.tasks.length).map(s => s.name);
+      const heavy = state.spheres.filter(s => s.tasks.length >= 4).map(s => s.name);
+      const restEmpty = state.spheres.some(s => /отдых/i.test(s.name) && !s.tasks.length);
+      let msg = '';
+      if (restEmpty) {
+        msg = 'В <strong>Отдыхе</strong> пока пусто — мягкий сигнал: без восстановления легче выгореть.';
+      } else if (empty.length && heavy.length) {
+        msg = `Много фокуса в «${heavy[0]}», а «${empty[0]}» без целей — можно чуть выровнять.`;
+      } else if (empty.length) {
+        msg = `Пока без целей: ${empty.slice(0, 3).join(', ')}. Это ок, если так задумано.`;
+      } else {
+        msg = 'У каждой сферы есть цели — хороший каркас. Можно отмечать выполненное.';
+      }
+      note.innerHTML = msg;
+    }
 
     load();
-    renderNodes();
-    window.addEventListener('resize', () => renderNodes());
+    render();
   </script>
 </body>
 </html>

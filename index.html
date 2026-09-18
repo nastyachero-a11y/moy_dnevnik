@@ -226,6 +226,16 @@
       50% { transform: scale(1.15); }
     }
 
+
+    .icon-map .map-branch {
+      stroke-dasharray: 24;
+      stroke-dashoffset: 24;
+      transition: stroke-dashoffset 0.5s ease;
+    }
+    .card:hover .icon-map .map-branch {
+      stroke-dashoffset: 0;
+    }
+
     .card h2 {
       font-size: 1.25rem;
       font-weight: 800;
@@ -401,6 +411,28 @@
         </div>
         <h2>Ресурсный круг</h2>
         <p>Собери свой круг поддержки. Добавляй людей, которые могут помочь, и заполняй их анкеты</p>
+      </a>
+
+
+      <!-- Карточка — Карта жизни -->
+      <a href="life-map.html" class="card">
+        <div class="card-icon">
+          <svg class="icon-map" viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="24" r="6" fill="#a8ff3e"/>
+            <path class="map-branch" d="M24 18 C24 12, 24 8, 24 6" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+            <path class="map-branch" d="M28 21 C34 16, 38 12, 40 10" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+            <path class="map-branch" d="M28 27 C34 32, 38 36, 40 38" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+            <path class="map-branch" d="M20 27 C14 32, 10 36, 8 38" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+            <path class="map-branch" d="M20 21 C14 16, 10 12, 8 10" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+            <circle cx="24" cy="5" r="2.5" fill="#fff"/>
+            <circle cx="41" cy="9" r="2.5" fill="#fff"/>
+            <circle cx="41" cy="39" r="2.5" fill="#fff"/>
+            <circle cx="7" cy="39" r="2.5" fill="#fff"/>
+            <circle cx="7" cy="9" r="2.5" fill="#fff"/>
+          </svg>
+        </div>
+        <h2>Карта жизни</h2>
+        <p>В центре — жизнь. От неё ветки к сферам: оцени и заполни каждую</p>
       </a>
 
       <!-- Карточка 6 — События недели -->

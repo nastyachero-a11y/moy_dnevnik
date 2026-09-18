@@ -321,7 +321,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'diary_life_mindmap_v2';
+    const STORAGE_KEY = 'diary_life_mindmap_v3';
     const CX = 50, CY = 50;
     const PRESETS = [
       'Здоровье',
@@ -363,22 +363,8 @@
           nextId = raw.nextId || 1;
         }
       } catch (e) {}
-      // first visit: seed 8 spheres
-      if (!state.spheres.length) {
-        state.spheres = PRESETS.map((name, i) => {
-          const angle = -Math.PI / 2 + (Math.PI * 2 * i) / PRESETS.length;
-          const r = 30;
-          return {
-            id: uid('sp'),
-            name,
-            x: +(CX + Math.cos(angle) * r).toFixed(2),
-            y: +(CY + Math.sin(angle) * r).toFixed(2),
-            color: COLORS[i % COLORS.length],
-            tasks: []
-          };
-        });
-        save();
-      }
+      // start empty: only center "Жизнь" until user adds spheres
+      if (!state.spheres) state.spheres = [];
     }
 
     function layoutSpheres() {
@@ -567,6 +553,20 @@
       center.style.top = CY + '%';
       center.innerHTML = '<div class="bubble">Жизнь</div>';
       map.appendChild(center);
+
+      // hint when map is empty
+      let hint = map.querySelector('.empty-hint');
+      if (!state.spheres.length) {
+        if (!hint) {
+          hint = document.createElement('div');
+          hint.className = 'empty-hint';
+          hint.style.cssText = 'position:absolute;left:50%;top:68%;transform:translateX(-50%);text-align:center;font-size:0.85rem;font-weight:600;color:rgba(255,255,255,0.88);max-width:240px;z-index:2;pointer-events:none;text-shadow:0 1px 8px rgba(0,0,0,0.25);';
+          hint.innerHTML = 'Пока только «Жизнь».<br>Нажми «+» справа, чтобы добавить сферу';
+          map.appendChild(hint);
+        }
+      } else if (hint) {
+        hint.remove();
+      }
 
       state.spheres.forEach(s => {
         // branch to sphere

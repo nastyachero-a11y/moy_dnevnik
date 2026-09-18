@@ -256,6 +256,60 @@
     }
     .check-row input { width: 18px; height: 18px; accent-color: #2bb673; }
 
+    .people-row {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+      margin-top: 6px; min-height: 40px;
+    }
+    .person-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #f0f4ff; border: 1px solid #d8e2f5;
+      border-radius: 20px; padding: 4px 10px 4px 4px;
+      font-size: 0.78rem; font-weight: 700; color: #1a1a2e;
+    }
+    .person-chip img {
+      width: 28px; height: 28px; border-radius: 50%;
+      object-fit: contain; background: #fff;
+    }
+    .person-chip .rm {
+      border: none; background: transparent; color: #8a90a5;
+      cursor: pointer; font-size: 1rem; line-height: 1; padding: 0 2px;
+    }
+    .add-person-btn {
+      border: 1.5px dashed #b8c4de; background: #fff;
+      border-radius: 20px; padding: 8px 12px;
+      font: 700 0.78rem inherit; color: #1e4fd6; cursor: pointer;
+    }
+    .add-person-btn:hover { border-color: #2bb673; background: #f3ffe8; }
+
+    .picker-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px; max-height: 280px; overflow-y: auto;
+      margin: 8px 0 12px;
+    }
+    .picker-item {
+      border: 1.5px solid #e4e8f0; background: #fff;
+      border-radius: 12px; padding: 8px 4px;
+      cursor: pointer; text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    .picker-item:hover { border-color: #2bb673; background: #f3ffe8; }
+    .picker-item img {
+      width: 48px; height: 48px; object-fit: contain;
+    }
+    .picker-item span {
+      font-size: 0.65rem; font-weight: 700; color: #1a1a2e;
+      max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .picker-section-title {
+      font-size: 0.78rem; font-weight: 700; color: #5a6280;
+      margin: 10px 0 6px;
+    }
+    @media (max-width: 500px) {
+      .picker-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+
     @media (max-width: 700px) {
       .workspace { grid-template-columns: 1fr; }
       .side-plus { flex-direction: row; justify-content: center; padding: 2px 0 8px; }
@@ -316,11 +370,15 @@
         </li>
         <li>
           <span>С кем рядом я это делаю:</span>
-          <input type="text" id="cWho" placeholder="...">
+          <input type="text" id="cWho" placeholder="Можно текстом...">
+          <div class="people-row" id="whoPeople"></div>
+          <button type="button" class="add-person-btn" data-slot="who">+ Персонаж</button>
         </li>
         <li>
           <span>Какой (или чей) вклад мне помог:</span>
-          <input type="text" id="cHelp" placeholder="...">
+          <input type="text" id="cHelp" placeholder="Можно текстом...">
+          <div class="people-row" id="helpPeople"></div>
+          <button type="button" class="add-person-btn" data-slot="help">+ Персонаж</button>
         </li>
         <li>
           <span>Как я себя в этом ощущаю:</span>
@@ -379,6 +437,24 @@
     </div>
   </div>
 
+
+  <div class="overlay" id="pickerOverlay">
+    <div class="modal">
+      <div class="modal-head">
+        <h2>Кто рядом</h2>
+        <button type="button" class="modal-close" data-close="pickerOverlay">×</button>
+      </div>
+      <div id="pickerBody"></div>
+      <div class="field" style="margin-top:8px;">
+        <label>Имя (если новый персонаж)</label>
+        <input type="text" id="pickerName" placeholder="Как назвать" maxlength="24">
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn btn-ghost" data-close="pickerOverlay">Отмена</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const STORAGE_KEY = 'diary_year_compass_map_v1';
     const CX = 50, CY = 50;
@@ -394,8 +470,15 @@
     let state = {
       spheres: [],
       qInfluence: '', qSkills: '',
-      cLearn: '', cWho: '', cHelp: '', cFeel: ''
+      cLearn: '', cWho: '', cHelp: '', cFeel: '',
+      whoPeople: [],  // [{avatarId, name}]
+      helpPeople: []
     };
+    const CHAR_IDS = [];
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 6; c++) CHAR_IDS.push(`char_${r}_${c}`);
+    function gifPath(id, type) { return `gifs/${id}_${type}.gif`; }
+    let pickerSlot = 'who'; // who | help
+    let pickerSelectedId = null;
     let nextId = 1;
     let selectedPreset = null;
     let mode = 'add';
@@ -561,6 +644,86 @@
       layoutSpheres(); save(); close('taskOverlay'); render();
     });
 
+    function getCirclePeople() {
+      const list = [];
+      try {
+        const raw = JSON.parse(localStorage.getItem('resourceCircle') || '{}');
+        if (raw.centerId) list.push({ avatarId: raw.centerId, name: 'Я', fromCircle: true });
+        (raw.members || []).forEach(m => {
+          if (m.avatarId) list.push({ avatarId: m.avatarId, name: m.name || 'Человек', fromCircle: true });
+        });
+      } catch (e) {}
+      return list;
+    }
+
+    function renderPeopleSlot(slot) {
+      const key = slot === 'who' ? 'whoPeople' : 'helpPeople';
+      const box = document.getElementById(slot === 'who' ? 'whoPeople' : 'helpPeople');
+      if (!box) return;
+      const arr = state[key] || [];
+      box.innerHTML = '';
+      arr.forEach((p, idx) => {
+        const chip = document.createElement('span');
+        chip.className = 'person-chip';
+        chip.innerHTML = `<img src="${gifPath(p.avatarId, 'blink')}" alt=""><span>${esc(p.name)}</span><button type="button" class="rm" data-slot="${slot}" data-idx="${idx}">×</button>`;
+        box.appendChild(chip);
+      });
+      box.querySelectorAll('.rm').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const s = btn.getAttribute('data-slot');
+          const i = +btn.getAttribute('data-idx');
+          const k = s === 'who' ? 'whoPeople' : 'helpPeople';
+          state[k].splice(i, 1);
+          save();
+          renderPeopleSlot(s);
+        });
+      });
+    }
+
+    function openPicker(slot) {
+      pickerSlot = slot;
+      pickerSelectedId = null;
+      document.getElementById('pickerName').value = '';
+      const body = document.getElementById('pickerBody');
+      const circle = getCirclePeople();
+      let html = '';
+      if (circle.length) {
+        html += '<div class="picker-section-title">Из ресурсного круга</div><div class="picker-grid">';
+        circle.forEach(p => {
+          html += `<button type="button" class="picker-item" data-id="${p.avatarId}" data-name="${esc(p.name)}"><img src="${gifPath(p.avatarId, 'blink')}" alt=""><span>${esc(p.name)}</span></button>`;
+        });
+        html += '</div>';
+      }
+      html += '<div class="picker-section-title">Все персонажи</div><div class="picker-grid">';
+      CHAR_IDS.forEach(id => {
+        html += `<button type="button" class="picker-item" data-id="${id}" data-name=""><img src="${gifPath(id, 'blink')}" alt=""><span></span></button>`;
+      });
+      html += '</div>';
+      body.innerHTML = html;
+      body.querySelectorAll('.picker-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-id');
+          let name = btn.getAttribute('data-name') || document.getElementById('pickerName').value.trim();
+          if (!name) {
+            const typed = prompt('Как зовут этого человека?', 'Друг');
+            if (typed === null) return;
+            name = typed.trim() || 'Друг';
+          }
+          const key = pickerSlot === 'who' ? 'whoPeople' : 'helpPeople';
+          if (!state[key]) state[key] = [];
+          if (state[key].some(p => p.avatarId === id && p.name === name)) {
+            close('pickerOverlay');
+            return;
+          }
+          state[key].push({ avatarId: id, name });
+          save();
+          renderPeopleSlot(pickerSlot);
+          close('pickerOverlay');
+        });
+      });
+      open('pickerOverlay');
+    }
+
     function bindReflect() {
       const map = {
         qInfluence: 'qInfluence', qSkills: 'qSkills',
@@ -568,12 +731,20 @@
       };
       Object.keys(map).forEach(id => {
         const el = document.getElementById(id);
+        if (!el) return;
         el.value = state[id] || '';
         el.addEventListener('input', () => {
           state[id] = el.value;
           clearTimeout(window.__refSave);
           window.__refSave = setTimeout(save, 450);
         });
+      });
+      if (!state.whoPeople) state.whoPeople = [];
+      if (!state.helpPeople) state.helpPeople = [];
+      renderPeopleSlot('who');
+      renderPeopleSlot('help');
+      document.querySelectorAll('.add-person-btn').forEach(btn => {
+        btn.addEventListener('click', () => openPicker(btn.getAttribute('data-slot')));
       });
     }
 

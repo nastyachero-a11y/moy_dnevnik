@@ -256,6 +256,132 @@
     }
     .check-row input { width: 18px; height: 18px; accent-color: #2bb673; }
 
+    /* Letter to future */
+    .envelope-dock {
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .envelope-wrap {
+      position: relative;
+      width: 88px;
+      height: 78px;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.25));
+      transition: transform 0.25s ease;
+    }
+    .envelope-dock:hover .envelope-wrap { transform: translateY(-4px) rotate(-2deg); }
+    .envelope-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .envelope-label {
+      position: absolute;
+      left: 50%;
+      top: 42%;
+      transform: translate(-50%, -50%) rotate(-6deg);
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 0.58rem;
+      font-weight: 700;
+      color: #5c4030;
+      white-space: nowrap;
+      pointer-events: none;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+    }
+    .envelope-meta {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.95);
+      text-shadow: 0 1px 6px rgba(0,0,0,0.35);
+      max-width: 120px;
+      line-height: 1.25;
+    }
+    .envelope-meta .saved {
+      color: var(--lime);
+    }
+
+    .letter-sheet {
+      background: #fff9ef;
+      background-image:
+        linear-gradient(rgba(180,150,100,0.08) 1px, transparent 1px);
+      background-size: 100% 28px;
+      border-radius: 4px 12px 12px 12px;
+      padding: 22px 18px 16px;
+      color: #3b2f24;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.3);
+      max-width: 480px;
+      width: 100%;
+      max-height: 92vh;
+      overflow-y: auto;
+      animation: letterOpen 0.35s ease;
+      border: 1px solid #e8d9c4;
+    }
+    @keyframes letterOpen {
+      from { opacity: 0; transform: translateY(20px) scale(0.92); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .letter-sheet h2 {
+      font-family: Georgia, serif;
+      font-size: 1.15rem;
+      color: #7a4a2a;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+    .letter-date {
+      font-size: 0.78rem;
+      color: #9a7b5f;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+    .letter-sheet .field label {
+      color: #7a5a40;
+      font-family: Georgia, serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+    .letter-sheet textarea {
+      background: rgba(255,255,255,0.7);
+      border: 1px solid #e0d0b8;
+      border-radius: 10px;
+      min-height: 72px;
+      color: #3b2f24;
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 0.92rem;
+    }
+    .letter-sheet textarea:focus {
+      border-color: #c4a574;
+      box-shadow: 0 0 0 3px rgba(196,165,116,0.2);
+    }
+    .letter-actions {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;
+    }
+    .letter-actions .btn {
+      flex: 1; min-width: 120px;
+    }
+    .btn-paper {
+      background: linear-gradient(135deg, #c4a574, #8b6a3f);
+      color: #fff;
+    }
+    .btn-paper-ghost {
+      background: rgba(139,106,63,0.12);
+      color: #7a5a40;
+    }
+
+    @media (max-width: 600px) {
+      .envelope-dock { left: 10px; bottom: 10px; }
+      .envelope-wrap { width: 72px; height: 64px; }
+      .envelope-label { font-size: 0.5rem; }
+    }
+
+
     .people-row {
       display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
       margin-top: 6px; min-height: 40px;
@@ -437,6 +563,43 @@
     </div>
   </div>
 
+
+
+  <div class="envelope-dock" id="envelopeDock" title="Письмо себе в будущее">
+    <div class="envelope-wrap">
+      <img src="envelope.png" alt="Конверт">
+      <span class="envelope-label">Себе в будущее</span>
+    </div>
+    <div class="envelope-meta" id="envelopeMeta">Открыть письмо</div>
+  </div>
+
+  <div class="overlay" id="letterOverlay">
+    <div class="letter-sheet" id="letterSheet">
+      <h2>Письмо себе в будущее</h2>
+      <div class="letter-date" id="letterDate">Дата: —</div>
+      <div class="field">
+        <label>1. Что я хочу себе сказать через год?</label>
+        <textarea id="letterQ1" placeholder="Напиши от сердца..."></textarea>
+      </div>
+      <div class="field">
+        <label>2. Что я обещаю себе сделать в этом году?</label>
+        <textarea id="letterQ2" placeholder="Моё обещание..."></textarea>
+      </div>
+      <div class="field">
+        <label>3. Что я разрешаю себе делать и чувствовать?</label>
+        <textarea id="letterQ3" placeholder="Я разрешаю себе..."></textarea>
+      </div>
+      <div class="field">
+        <label>4. За что я себя прощаю?</label>
+        <textarea id="letterQ4" placeholder="Я прощаю себя за..."></textarea>
+      </div>
+      <div class="letter-actions">
+        <button type="button" class="btn btn-paper" id="letterSave">Сохранить</button>
+        <button type="button" class="btn btn-paper-ghost" id="letterPdf">Скачать в PDF</button>
+        <button type="button" class="btn btn-ghost" data-close="letterOverlay">Закрыть</button>
+      </div>
+    </div>
+  </div>
 
   <div class="overlay" id="pickerOverlay">
     <div class="modal">
@@ -827,10 +990,137 @@
       }
     }
 
+
+    // ===== Letter to future =====
+    const LETTER_KEY = 'diary_letter_future_v1';
+    let letterData = {
+      q1: '', q2: '', q3: '', q4: '',
+      createdAt: null,
+      updatedAt: null,
+      saved: false
+    };
+
+    function formatDate(ts) {
+      if (!ts) return '—';
+      const d = new Date(ts);
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      return dd + '.' + mm + '.' + yyyy;
+    }
+
+    function loadLetter() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(LETTER_KEY));
+        if (raw) letterData = { ...letterData, ...raw };
+      } catch (e) {}
+      updateEnvelopeMeta();
+    }
+
+    function saveLetter() {
+      letterData.q1 = document.getElementById('letterQ1').value;
+      letterData.q2 = document.getElementById('letterQ2').value;
+      letterData.q3 = document.getElementById('letterQ3').value;
+      letterData.q4 = document.getElementById('letterQ4').value;
+      const now = Date.now();
+      if (!letterData.createdAt) letterData.createdAt = now;
+      letterData.updatedAt = now;
+      letterData.saved = true;
+      localStorage.setItem(LETTER_KEY, JSON.stringify(letterData));
+      updateEnvelopeMeta();
+      const el = document.getElementById('saveStatus');
+      el.textContent = 'Письмо сохранено ✓';
+      el.classList.add('show');
+      setTimeout(() => { el.classList.remove('show'); el.textContent = 'Сохранено ✓'; }, 1600);
+      // fold back
+      close('letterOverlay');
+    }
+
+    function updateEnvelopeMeta() {
+      const meta = document.getElementById('envelopeMeta');
+      if (letterData.saved) {
+        meta.innerHTML = '<span class="saved">Письмо сохранено</span><br>' + formatDate(letterData.updatedAt || letterData.createdAt);
+      } else {
+        meta.textContent = 'Открыть письмо';
+      }
+    }
+
+    function openLetter() {
+      document.getElementById('letterQ1').value = letterData.q1 || '';
+      document.getElementById('letterQ2').value = letterData.q2 || '';
+      document.getElementById('letterQ3').value = letterData.q3 || '';
+      document.getElementById('letterQ4').value = letterData.q4 || '';
+      const d = letterData.updatedAt || letterData.createdAt;
+      document.getElementById('letterDate').textContent = d
+        ? ('Дата: ' + formatDate(d) + (letterData.saved ? '' : ' (черновик)'))
+        : ('Дата: ' + formatDate(Date.now()) + ' (новое письмо)');
+      open('letterOverlay');
+    }
+
+    async function downloadLetterPdf() {
+      // ensure current fields are in letterData for PDF content
+      letterData.q1 = document.getElementById('letterQ1').value;
+      letterData.q2 = document.getElementById('letterQ2').value;
+      letterData.q3 = document.getElementById('letterQ3').value;
+      letterData.q4 = document.getElementById('letterQ4').value;
+      if (!window.html2canvas || !window.jspdf) {
+        alert('PDF-библиотека не загрузилась. Проверь интернет и обнови страницу.');
+        return;
+      }
+      const sheet = document.getElementById('letterSheet');
+      try {
+        const canvas = await html2canvas(sheet, {
+          backgroundColor: '#fff9ef',
+          scale: 2,
+          useCORS: true
+        });
+        const img = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pageW = pdf.internal.pageSize.getWidth();
+        const pageH = pdf.internal.pageSize.getHeight();
+        const margin = 12;
+        const w = pageW - margin * 2;
+        const h = canvas.height * w / canvas.width;
+        let y = margin;
+        if (h <= pageH - margin * 2) {
+          pdf.addImage(img, 'PNG', margin, y, w, h);
+        } else {
+          // multi-page crop
+          let remaining = h;
+          let srcY = 0;
+          const pageImgH = pageH - margin * 2;
+          while (remaining > 0) {
+            const sliceH = Math.min(pageImgH, remaining);
+            const sliceCanvas = document.createElement('canvas');
+            sliceCanvas.width = canvas.width;
+            sliceCanvas.height = Math.floor(sliceH * canvas.width / w);
+            const ctx = sliceCanvas.getContext('2d');
+            ctx.drawImage(canvas, 0, srcY, canvas.width, sliceCanvas.height, 0, 0, canvas.width, sliceCanvas.height);
+            pdf.addImage(sliceCanvas.toDataURL('image/png'), 'PNG', margin, margin, w, sliceH);
+            remaining -= sliceH;
+            srcY += sliceCanvas.height;
+            if (remaining > 0) pdf.addPage();
+          }
+        }
+        pdf.save('pismo-sebe-' + formatDate(Date.now()).replace(/\./g, '-') + '.pdf');
+      } catch (e) {
+        console.error(e);
+        alert('Не удалось создать PDF');
+      }
+    }
+
+    document.getElementById('envelopeDock').addEventListener('click', openLetter);
+    document.getElementById('letterSave').addEventListener('click', saveLetter);
+    document.getElementById('letterPdf').addEventListener('click', downloadLetterPdf);
+    loadLetter();
+
     load();
     layoutSpheres();
     bindReflect();
     render();
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
 </body>
 </html>

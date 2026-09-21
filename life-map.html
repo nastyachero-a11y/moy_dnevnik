@@ -154,6 +154,29 @@
     .balance-note strong { color: #c47a10; }
 
     /* Reflection */
+
+    .sphere-reflects { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; }
+    .sphere-reflect-card {
+      background: rgba(255,255,255,0.96);
+      color: var(--ink);
+      border-radius: 16px;
+      padding: 16px 16px 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      border-left: 5px solid #1e4fd6;
+    }
+    .sphere-reflect-card h3 {
+      font-size: 0.95rem; font-weight: 800; color: #1e4fd6;
+      margin-bottom: 12px;
+    }
+    .sphere-reflect-card .field { margin-bottom: 12px; }
+    .sphere-reflect-card .sub-title {
+      font-size: 0.82rem; font-weight: 800; color: #1e4fd6;
+      margin: 10px 0 6px;
+    }
+    .sphere-reflect-card .lead-sm {
+      font-size: 0.78rem; font-weight: 600; color: var(--soft); margin-bottom: 8px;
+    }
+
     .reflect {
       margin-top: 14px;
       background: rgba(255,255,255,0.96);
@@ -256,18 +279,41 @@
     }
     .check-row input { width: 18px; height: 18px; accent-color: #2bb673; }
 
+
     /* Letter to future */
     .envelope-dock {
       position: fixed;
-      left: 16px;
-      bottom: 16px;
+      left: 14px;
+      bottom: 14px;
       z-index: 30;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      gap: 4px;
+      align-items: center;
+      gap: 2px;
       cursor: pointer;
       user-select: none;
+      width: 110px;
+    }
+    .envelope-caption {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      line-height: 1.2;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.4);
+      max-width: 110px;
+    }
+    .envelope-arrow {
+      font-size: 1rem;
+      color: #a8ff3e;
+      line-height: 1;
+      animation: arrowBob 1.4s ease-in-out infinite;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.3);
+    }
+    @keyframes arrowBob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(4px); }
     }
     .envelope-wrap {
       position: relative;
@@ -283,19 +329,6 @@
       object-fit: contain;
       display: block;
     }
-    .envelope-label {
-      position: absolute;
-      left: 50%;
-      top: 42%;
-      transform: translate(-50%, -50%) rotate(-6deg);
-      font-family: Georgia, 'Times New Roman', serif;
-      font-size: 0.58rem;
-      font-weight: 700;
-      color: #5c4030;
-      white-space: nowrap;
-      pointer-events: none;
-      text-shadow: 0 1px 0 rgba(255,255,255,0.6);
-    }
     .envelope-meta {
       font-size: 0.68rem;
       font-weight: 700;
@@ -303,69 +336,78 @@
       text-shadow: 0 1px 6px rgba(0,0,0,0.35);
       max-width: 120px;
       line-height: 1.25;
+      text-align: center;
     }
-    .envelope-meta .saved {
-      color: var(--lime);
-    }
+    .envelope-meta .saved { color: var(--lime); }
 
+    .letter-overlay-inner {
+      position: relative;
+      width: min(920px, 100%);
+      max-height: 92vh;
+      display: grid;
+      grid-template-columns: 1fr 200px;
+      gap: 12px;
+      align-items: stretch;
+    }
     .letter-sheet {
       background: #fff9ef;
-      background-image:
-        linear-gradient(rgba(180,150,100,0.08) 1px, transparent 1px);
-      background-size: 100% 28px;
+      background-image: repeating-linear-gradient(
+        transparent, transparent 27px,
+        rgba(180,150,100,0.12) 27px, rgba(180,150,100,0.12) 28px
+      );
       border-radius: 4px 12px 12px 12px;
       padding: 22px 18px 16px;
       color: #3b2f24;
       box-shadow: 0 18px 50px rgba(0,0,0,0.3);
-      max-width: 480px;
       width: 100%;
       max-height: 92vh;
       overflow-y: auto;
       animation: letterOpen 0.35s ease;
       border: 1px solid #e8d9c4;
+      display: flex;
+      flex-direction: column;
     }
     @keyframes letterOpen {
       from { opacity: 0; transform: translateY(20px) scale(0.92); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
     .letter-sheet h2 {
-      font-family: Georgia, serif;
-      font-size: 1.15rem;
-      color: #7a4a2a;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1.05rem;
+      color: #5c4030;
       margin-bottom: 4px;
       font-weight: 700;
+      letter-spacing: 0.02em;
     }
     .letter-date {
+      font-family: 'Courier New', Courier, monospace;
       font-size: 0.78rem;
       color: #9a7b5f;
       font-weight: 600;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
-    .letter-sheet .field label {
-      color: #7a5a40;
-      font-family: Georgia, serif;
-      font-size: 0.88rem;
-      font-weight: 700;
+    .letter-body {
+      flex: 1;
+      width: 100%;
+      min-height: 280px;
+      border: none;
+      background: transparent;
+      resize: vertical;
+      outline: none;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1rem;
+      line-height: 28px;
+      color: #2a2218;
+      padding: 0 2px;
     }
-    .letter-sheet textarea {
-      background: rgba(255,255,255,0.7);
-      border: 1px solid #e0d0b8;
-      border-radius: 10px;
-      min-height: 72px;
-      color: #3b2f24;
-      font-family: Georgia, 'Times New Roman', serif;
-      font-size: 0.92rem;
-    }
-    .letter-sheet textarea:focus {
-      border-color: #c4a574;
-      box-shadow: 0 0 0 3px rgba(196,165,116,0.2);
+    .letter-body::placeholder {
+      color: #b5a390;
+      font-family: 'Courier New', Courier, monospace;
     }
     .letter-actions {
-      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px;
     }
-    .letter-actions .btn {
-      flex: 1; min-width: 120px;
-    }
+    .letter-actions .btn { flex: 1; min-width: 110px; }
     .btn-paper {
       background: linear-gradient(135deg, #c4a574, #8b6a3f);
       color: #fff;
@@ -375,11 +417,51 @@
       color: #7a5a40;
     }
 
-    @media (max-width: 600px) {
-      .envelope-dock { left: 10px; bottom: 10px; }
-      .envelope-wrap { width: 72px; height: 64px; }
-      .envelope-label { font-size: 0.5rem; }
+    .thoughts-col {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      min-height: 320px;
     }
+    .thought-bubble {
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.95);
+      color: #1a1a2e;
+      border-radius: 14px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      line-height: 1.35;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+      animation: thoughtFloat linear infinite;
+      opacity: 0;
+    }
+    @keyframes thoughtFloat {
+      0%   { transform: translateY(110%); opacity: 0; }
+      8%   { opacity: 1; }
+      85%  { opacity: 1; }
+      100% { transform: translateY(-130%); opacity: 0; }
+    }
+
+    @media (max-width: 700px) {
+      .envelope-dock { left: 10px; bottom: 10px; width: 96px; }
+      .envelope-wrap { width: 72px; height: 64px; }
+      .envelope-caption { font-size: 0.64rem; }
+      .letter-overlay-inner {
+        grid-template-columns: 1fr;
+        max-height: 92vh;
+        overflow-y: auto;
+      }
+      .thoughts-col {
+        min-height: 140px;
+        max-height: 160px;
+      }
+    }
+
 
 
     .people-row {
@@ -474,44 +556,11 @@
       <div class="balance-note" id="balanceNote">Добавляй цели в сферы — здесь появится подсказка по балансу</div>
     </div>
 
-    <section class="reflect">
-      <h3>Рефлексия</h3>
-      <p class="lead">Вопросы, которые помогают увидеть год не только как список целей, а как путь.</p>
-
-      <div class="field">
-        <label>Есть ли среди целей что-то, на что я прямо сейчас не могу повлиять?</label>
-        <textarea id="qInfluence" placeholder="Твои мысли..."></textarea>
+    <div class="sphere-reflects" id="sphereReflects">
+      <div class="balance" style="margin:0;" id="reflectEmpty">
+        <div class="balance-note">Добавь сферы на карте — здесь появятся карточки самопознания по каждой</div>
       </div>
-      <div class="field">
-        <label>Какие качества и навыки, которые я в себе открыл(а), могут помочь мне в достижении цели?</label>
-        <textarea id="qSkills" placeholder="Твои качества и навыки..."></textarea>
-      </div>
-
-      <h3 style="margin-top:8px;">Критерии проверки</h3>
-      <p class="lead" style="margin-bottom:8px;">Как я пойму, что достиг(ла) цели?</p>
-      <ul class="criteria">
-        <li>
-          <span>Чему я научился(лась):</span>
-          <input type="text" id="cLearn" placeholder="...">
-        </li>
-        <li>
-          <span>С кем рядом я это делаю:</span>
-          <input type="text" id="cWho" placeholder="Можно текстом...">
-          <div class="people-row" id="whoPeople"></div>
-          <button type="button" class="add-person-btn" data-slot="who">+ Персонаж</button>
-        </li>
-        <li>
-          <span>Какой (или чей) вклад мне помог:</span>
-          <input type="text" id="cHelp" placeholder="Можно текстом...">
-          <div class="people-row" id="helpPeople"></div>
-          <button type="button" class="add-person-btn" data-slot="help">+ Персонаж</button>
-        </li>
-        <li>
-          <span>Как я себя в этом ощущаю:</span>
-          <input type="text" id="cFeel" placeholder="...">
-        </li>
-      </ul>
-    </section>
+    </div>
 
     <div class="save-status" id="saveStatus">Сохранено ✓</div>
   </main>
@@ -541,16 +590,24 @@
         <button type="button" class="modal-close" data-close="taskOverlay">×</button>
       </div>
       <div class="field">
-        <label>1. Сфера</label>
+        <label>Сфера</label>
         <input type="text" id="taskSphereName" readonly style="background:#f4f6fa;font-weight:700;color:#1e4fd6;">
       </div>
       <div class="field">
-        <label>2. Конкретная цель</label>
+        <label>Цель</label>
         <input type="text" id="taskText" placeholder="Чего хочу достичь" maxlength="60">
       </div>
       <div class="field">
-        <label>3. Шаги для выполнения данной цели</label>
-        <textarea id="taskSteps" placeholder="Какие конкретные шаги сделаю..."></textarea>
+        <label>Задачи</label>
+        <textarea id="taskTasks" placeholder="Что конкретно буду делать..."></textarea>
+      </div>
+      <div class="field">
+        <label>Ресурсы, которые у меня уже есть</label>
+        <textarea id="taskResources" placeholder="Что уже есть..."></textarea>
+      </div>
+      <div class="field">
+        <label>Как проверю</label>
+        <textarea id="taskCheck" placeholder="Как пойму, что получилось..."></textarea>
       </div>
       <label class="check-row" id="doneRow" hidden>
         <input type="checkbox" id="taskDone"> Цель достигнута
@@ -566,38 +623,27 @@
 
 
   <div class="envelope-dock" id="envelopeDock" title="Письмо себе в будущее">
+    <div class="envelope-caption">Себе в будущее</div>
+    <div class="envelope-arrow">↓</div>
     <div class="envelope-wrap">
       <img src="envelope.png" alt="Конверт">
-      <span class="envelope-label">Себе в будущее</span>
     </div>
     <div class="envelope-meta" id="envelopeMeta">Открыть письмо</div>
   </div>
 
   <div class="overlay" id="letterOverlay">
-    <div class="letter-sheet" id="letterSheet">
-      <h2>Письмо себе в будущее</h2>
-      <div class="letter-date" id="letterDate">Дата: —</div>
-      <div class="field">
-        <label>1. Что я хочу себе сказать через год?</label>
-        <textarea id="letterQ1" placeholder="Напиши от сердца..."></textarea>
+    <div class="letter-overlay-inner">
+      <div class="letter-sheet" id="letterSheet">
+        <h2>Письмо себе в будущее</h2>
+        <div class="letter-date" id="letterDate">Дата: —</div>
+        <textarea class="letter-body" id="letterBody" placeholder="Пиши свободно — как письмо себе через год..."></textarea>
+        <div class="letter-actions">
+          <button type="button" class="btn btn-paper" id="letterSave">Сохранить</button>
+          <button type="button" class="btn btn-paper-ghost" id="letterPdf">Скачать в PDF</button>
+          <button type="button" class="btn btn-ghost" data-close="letterOverlay">Закрыть</button>
+        </div>
       </div>
-      <div class="field">
-        <label>2. Что я обещаю себе сделать в этом году?</label>
-        <textarea id="letterQ2" placeholder="Моё обещание..."></textarea>
-      </div>
-      <div class="field">
-        <label>3. Что я разрешаю себе делать и чувствовать?</label>
-        <textarea id="letterQ3" placeholder="Я разрешаю себе..."></textarea>
-      </div>
-      <div class="field">
-        <label>4. За что я себя прощаю?</label>
-        <textarea id="letterQ4" placeholder="Я прощаю себя за..."></textarea>
-      </div>
-      <div class="letter-actions">
-        <button type="button" class="btn btn-paper" id="letterSave">Сохранить</button>
-        <button type="button" class="btn btn-paper-ghost" id="letterPdf">Скачать в PDF</button>
-        <button type="button" class="btn btn-ghost" data-close="letterOverlay">Закрыть</button>
-      </div>
+      <div class="thoughts-col" id="thoughtsCol" aria-hidden="true"></div>
     </div>
   </div>
 
@@ -619,7 +665,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'diary_year_compass_map_v1';
+    const STORAGE_KEY = 'diary_year_compass_map_v2';
     const CX = 50, CY = 50;
     const PRESETS = [
       'Здоровье', 'Деньги', 'Карьера / Работа', 'Личная жизнь',
@@ -631,11 +677,9 @@
     ];
 
     let state = {
-      spheres: [],
-      qInfluence: '', qSkills: '',
-      cLearn: '', cWho: '', cHelp: '', cFeel: '',
-      whoPeople: [],  // [{avatarId, name}]
-      helpPeople: []
+      spheres: []
+      // sphere: { id, name, x, y, color, tasks: [{id,text,tasks,resources,check,done}],
+      //           reflect: { influence, skills, learn, who, help, feel, whoPeople, helpPeople } }
     };
     const CHAR_IDS = [];
     for (let r = 0; r < 3; r++) for (let c = 0; c < 6; c++) CHAR_IDS.push(`char_${r}_${c}`);
@@ -664,6 +708,10 @@
         if (raw && raw.state) {
           state = { ...state, ...raw.state };
           if (!Array.isArray(state.spheres)) state.spheres = [];
+          state.spheres.forEach(s => {
+            if (!s.tasks) s.tasks = [];
+            if (!s.reflect) s.reflect = { influence:'', skills:'', learn:'', who:'', help:'', feel:'', whoPeople:[], helpPeople:[] };
+          });
           nextId = raw.nextId || 1;
         }
       } catch (e) {}
@@ -739,7 +787,9 @@
       }
       state.spheres.push({
         id: uid('sp'), name, x: CX, y: CY,
-        color: COLORS[state.spheres.length % COLORS.length], tasks: []
+        color: COLORS[state.spheres.length % COLORS.length],
+        tasks: [],
+        reflect: { influence:'', skills:'', learn:'', who:'', help:'', feel:'', whoPeople:[], helpPeople:[] }
       });
       layoutSpheres(); save(); close('addSphereOverlay'); render();
     });
@@ -751,7 +801,9 @@
       document.getElementById('taskModalTitle').textContent = 'Новая цель';
       document.getElementById('taskSphereName').value = s.name;
       document.getElementById('taskText').value = '';
-      document.getElementById('taskSteps').value = '';
+      document.getElementById('taskTasks').value = '';
+      document.getElementById('taskResources').value = '';
+      document.getElementById('taskCheck').value = '';
       document.getElementById('taskDone').checked = false;
       document.getElementById('doneRow').hidden = true;
       document.getElementById('deleteTaskBtn').hidden = true;
@@ -766,8 +818,10 @@
       if (!s || !t) return;
       document.getElementById('taskModalTitle').textContent = 'Редактировать цель';
       document.getElementById('taskSphereName').value = s.name;
-      document.getElementById('taskText').value = t.text;
-      document.getElementById('taskSteps').value = t.steps || t.why || '';
+      document.getElementById('taskText').value = t.text || '';
+      document.getElementById('taskTasks').value = t.tasks || t.steps || '';
+      document.getElementById('taskResources').value = t.resources || '';
+      document.getElementById('taskCheck').value = t.check || '';
       document.getElementById('taskDone').checked = !!t.done;
       document.getElementById('doneRow').hidden = false;
       document.getElementById('deleteTaskBtn').hidden = false;
@@ -779,16 +833,19 @@
       const s = state.spheres.find(x => x.id === activeSphereId);
       if (!s) return;
       const text = document.getElementById('taskText').value.trim();
-      const steps = document.getElementById('taskSteps').value.trim();
-      if (!text) { alert('Напиши конкретную цель'); return; }
-      if (!steps) { alert('Напиши шаги для выполнения цели'); return; }
+      const tasks = document.getElementById('taskTasks').value.trim();
+      const resources = document.getElementById('taskResources').value.trim();
+      const check = document.getElementById('taskCheck').value.trim();
+      if (!text) { alert('Напиши цель'); return; }
       if (mode === 'add') {
-        s.tasks.push({ id: uid('t'), text: text.slice(0, 60), steps, done: false });
+        s.tasks.push({ id: uid('t'), text: text.slice(0, 60), tasks, resources, check, done: false });
       } else {
         const t = s.tasks.find(x => x.id === activeTaskId);
         if (!t) return;
         t.text = text.slice(0, 60);
-        t.steps = steps;
+        t.tasks = tasks;
+        t.resources = resources;
+        t.check = check;
         t.done = document.getElementById('taskDone').checked;
       }
       save(); close('taskOverlay'); render();
@@ -807,6 +864,17 @@
       layoutSpheres(); save(); close('taskOverlay'); render();
     });
 
+    function emptyReflect() {
+      return { influence:'', skills:'', learn:'', who:'', help:'', feel:'', whoPeople:[], helpPeople:[] };
+    }
+
+    function ensureReflect(s) {
+      if (!s.reflect) s.reflect = emptyReflect();
+      if (!Array.isArray(s.reflect.whoPeople)) s.reflect.whoPeople = [];
+      if (!Array.isArray(s.reflect.helpPeople)) s.reflect.helpPeople = [];
+      return s.reflect;
+    }
+
     function getCirclePeople() {
       const list = [];
       try {
@@ -819,33 +887,9 @@
       return list;
     }
 
-    function renderPeopleSlot(slot) {
-      const key = slot === 'who' ? 'whoPeople' : 'helpPeople';
-      const box = document.getElementById(slot === 'who' ? 'whoPeople' : 'helpPeople');
-      if (!box) return;
-      const arr = state[key] || [];
-      box.innerHTML = '';
-      arr.forEach((p, idx) => {
-        const chip = document.createElement('span');
-        chip.className = 'person-chip';
-        chip.innerHTML = `<img src="${gifPath(p.avatarId, 'blink')}" alt=""><span>${esc(p.name)}</span><button type="button" class="rm" data-slot="${slot}" data-idx="${idx}">×</button>`;
-        box.appendChild(chip);
-      });
-      box.querySelectorAll('.rm').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const s = btn.getAttribute('data-slot');
-          const i = +btn.getAttribute('data-idx');
-          const k = s === 'who' ? 'whoPeople' : 'helpPeople';
-          state[k].splice(i, 1);
-          save();
-          renderPeopleSlot(s);
-        });
-      });
-    }
-
-    function openPicker(slot) {
+    function openPicker(slot, sphereId) {
       pickerSlot = slot;
-      pickerSelectedId = null;
+      pickerSphereId = sphereId;
       document.getElementById('pickerName').value = '';
       const body = document.getElementById('pickerBody');
       const circle = getCirclePeople();
@@ -866,52 +910,116 @@
       body.querySelectorAll('.picker-item').forEach(btn => {
         btn.addEventListener('click', () => {
           const id = btn.getAttribute('data-id');
-          let name = btn.getAttribute('data-name') || document.getElementById('pickerName').value.trim();
+          let name = btn.getAttribute('data-name') || '';
           if (!name) {
             const typed = prompt('Как зовут этого человека?', 'Друг');
             if (typed === null) return;
             name = typed.trim() || 'Друг';
           }
+          const s = state.spheres.find(x => x.id === pickerSphereId);
+          if (!s) return;
+          const ref = ensureReflect(s);
           const key = pickerSlot === 'who' ? 'whoPeople' : 'helpPeople';
-          if (!state[key]) state[key] = [];
-          if (state[key].some(p => p.avatarId === id && p.name === name)) {
-            close('pickerOverlay');
-            return;
+          if (ref[key].some(p => p.avatarId === id && p.name === name)) {
+            close('pickerOverlay'); return;
           }
-          state[key].push({ avatarId: id, name });
+          ref[key].push({ avatarId: id, name });
           save();
-          renderPeopleSlot(pickerSlot);
+          renderSphereReflects();
           close('pickerOverlay');
         });
       });
       open('pickerOverlay');
     }
 
-    function bindReflect() {
-      const map = {
-        qInfluence: 'qInfluence', qSkills: 'qSkills',
-        cLearn: 'cLearn', cWho: 'cWho', cHelp: 'cHelp', cFeel: 'cFeel'
-      };
-      Object.keys(map).forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.value = state[id] || '';
+    function renderSphereReflects() {
+      const root = document.getElementById('sphereReflects');
+      if (!root) return;
+      root.innerHTML = '';
+      if (!state.spheres.length) {
+        root.innerHTML = '<div class="balance" style="margin:0;"><div class="balance-note">Добавь сферы на карте — здесь появятся карточки самопознания по каждой</div></div>';
+        return;
+      }
+      state.spheres.forEach(s => {
+        const ref = ensureReflect(s);
+        const card = document.createElement('section');
+        card.className = 'sphere-reflect-card';
+        card.style.borderLeftColor = '#1e4fd6';
+
+        const whoChips = (ref.whoPeople || []).map((p, i) =>
+          `<span class="person-chip"><img src="${gifPath(p.avatarId,'blink')}" alt=""><span>${esc(p.name)}</span><button type="button" class="rm" data-sid="${s.id}" data-slot="who" data-idx="${i}">×</button></span>`
+        ).join('');
+        const helpChips = (ref.helpPeople || []).map((p, i) =>
+          `<span class="person-chip"><img src="${gifPath(p.avatarId,'blink')}" alt=""><span>${esc(p.name)}</span><button type="button" class="rm" data-sid="${s.id}" data-slot="help" data-idx="${i}">×</button></span>`
+        ).join('');
+
+        card.innerHTML = `
+          <h3>Самопознание · ${esc(s.name)}</h3>
+          <div class="field">
+            <label>Есть ли среди целей что-то, на что я прямо сейчас не могу повлиять?</label>
+            <textarea data-sid="${s.id}" data-key="influence" placeholder="Твои мысли...">${esc(ref.influence)}</textarea>
+          </div>
+          <div class="field">
+            <label>Какие качества и навыки, которые я в себе открыл(а), могут помочь мне в достижении цели?</label>
+            <textarea data-sid="${s.id}" data-key="skills" placeholder="Твои качества и навыки...">${esc(ref.skills)}</textarea>
+          </div>
+          <div class="sub-title">Критерии проверки</div>
+          <p class="lead-sm">Как я пойму, что достиг(ла) цели?</p>
+          <div class="field">
+            <label>Чему я научился(лась)</label>
+            <input type="text" data-sid="${s.id}" data-key="learn" value="${esc(ref.learn)}" placeholder="...">
+          </div>
+          <div class="field">
+            <label>С кем рядом я это делаю</label>
+            <input type="text" data-sid="${s.id}" data-key="who" value="${esc(ref.who)}" placeholder="Можно текстом...">
+            <div class="people-row">${whoChips}</div>
+            <button type="button" class="add-person-btn" data-sid="${s.id}" data-slot="who">+ Персонаж</button>
+          </div>
+          <div class="field">
+            <label>Какой (или чей) вклад мне помог</label>
+            <input type="text" data-sid="${s.id}" data-key="help" value="${esc(ref.help)}" placeholder="Можно текстом...">
+            <div class="people-row">${helpChips}</div>
+            <button type="button" class="add-person-btn" data-sid="${s.id}" data-slot="help">+ Персонаж</button>
+          </div>
+          <div class="field">
+            <label>Как я себя в этом ощущаю</label>
+            <input type="text" data-sid="${s.id}" data-key="feel" value="${esc(ref.feel)}" placeholder="...">
+          </div>
+        `;
+        root.appendChild(card);
+      });
+
+      root.querySelectorAll('textarea[data-key], input[data-key]').forEach(el => {
         el.addEventListener('input', () => {
-          state[id] = el.value;
+          const s = state.spheres.find(x => x.id === el.getAttribute('data-sid'));
+          if (!s) return;
+          ensureReflect(s)[el.getAttribute('data-key')] = el.value;
           clearTimeout(window.__refSave);
           window.__refSave = setTimeout(save, 450);
         });
       });
-      if (!state.whoPeople) state.whoPeople = [];
-      if (!state.helpPeople) state.helpPeople = [];
-      renderPeopleSlot('who');
-      renderPeopleSlot('help');
-      document.querySelectorAll('.add-person-btn').forEach(btn => {
-        btn.addEventListener('click', () => openPicker(btn.getAttribute('data-slot')));
+      root.querySelectorAll('.add-person-btn').forEach(btn => {
+        btn.addEventListener('click', () => openPicker(btn.getAttribute('data-slot'), btn.getAttribute('data-sid')));
+      });
+      root.querySelectorAll('.rm').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const s = state.spheres.find(x => x.id === btn.getAttribute('data-sid'));
+          if (!s) return;
+          const ref = ensureReflect(s);
+          const key = btn.getAttribute('data-slot') === 'who' ? 'whoPeople' : 'helpPeople';
+          ref[key].splice(+btn.getAttribute('data-idx'), 1);
+          save();
+          renderSphereReflects();
+        });
       });
     }
 
-    function render() {
+    function bindReflect() {
+      // people picker needs sphere id now
+      renderSphereReflects();
+    }
+
+        function render() {
       const map = document.getElementById('map');
       const svg = document.getElementById('svg');
       map.querySelectorAll('.node, .empty-hint').forEach(n => n.remove());
@@ -988,17 +1096,52 @@
           note.textContent = 'Пустые сферы: ' + empty.slice(0, 3).join(', ') + '.';
         }
       }
+      renderSphereReflects();
     }
 
 
+
     // ===== Letter to future =====
-    const LETTER_KEY = 'diary_letter_future_v1';
+    const LETTER_KEY = 'diary_letter_future_v2';
     let letterData = {
-      q1: '', q2: '', q3: '', q4: '',
+      body: '',
       createdAt: null,
       updatedAt: null,
       saved: false
     };
+
+    const THOUGHTS = [
+      'Чему я хочу научиться в этом году?',
+      'С кем я хочу быть рядом?',
+      'Какой вклад хочу внести?',
+      'Как я хочу себя чувствовать через год?',
+      'Что для меня сейчас по-настоящему моё?',
+      'От чего я готов(а) отказаться?',
+      'Что я переформулирую под себя?',
+      'Где мне нужно просто принять?',
+      'Какая граница для меня важнее всего?',
+      'Кто в моём ресурсном круге уже рядом?',
+      'О чём я молчу, но хочу сказать себе?',
+      'За что я могу себя похвалить уже сейчас?',
+      'Что я разрешаю себе делать без вины?',
+      'Что я разрешаю себе чувствовать?',
+      'За что я себя прощаю?',
+      'Какой маленький шаг сделаю на этой неделе?',
+      'Где я обычно выгораю — и что с этим сделать?',
+      'Что для меня отдых по-настоящему?',
+      'Какую сферу жизни я долго откладывал(а)?',
+      'Какая цель греет, а какая только «надо»?',
+      'Что я хочу оставить в прошлом году?',
+      'Что я хочу взять с собой дальше?',
+      'Кому я благодарен(на) прямо сейчас?',
+      'Какой страх я готов(а) назвать вслух?',
+      'Где мне нужна поддержка, а не героизм?',
+      'Что будет достаточно — без идеала?',
+      'Каким человеком я хочу стать мягче?',
+      'О чём я хочу вспомнить через год с теплом?',
+      'Что я обещаю себе не бросать?',
+      'Если никто не увидит — чего я всё равно хочу?'
+    ];
 
     function formatDate(ts) {
       if (!ts) return '—';
@@ -1012,16 +1155,19 @@
     function loadLetter() {
       try {
         const raw = JSON.parse(localStorage.getItem(LETTER_KEY));
-        if (raw) letterData = { ...letterData, ...raw };
+        if (raw) {
+          letterData = { ...letterData, ...raw };
+          // migrate old 4-field letter if present
+          if (!letterData.body && (raw.q1 || raw.q2 || raw.q3 || raw.q4)) {
+            letterData.body = [raw.q1, raw.q2, raw.q3, raw.q4].filter(Boolean).join('\n\n');
+          }
+        }
       } catch (e) {}
       updateEnvelopeMeta();
     }
 
     function saveLetter() {
-      letterData.q1 = document.getElementById('letterQ1').value;
-      letterData.q2 = document.getElementById('letterQ2').value;
-      letterData.q3 = document.getElementById('letterQ3').value;
-      letterData.q4 = document.getElementById('letterQ4').value;
+      letterData.body = document.getElementById('letterBody').value;
       const now = Date.now();
       if (!letterData.createdAt) letterData.createdAt = now;
       letterData.updatedAt = now;
@@ -1032,7 +1178,6 @@
       el.textContent = 'Письмо сохранено ✓';
       el.classList.add('show');
       setTimeout(() => { el.classList.remove('show'); el.textContent = 'Сохранено ✓'; }, 1600);
-      // fold back
       close('letterOverlay');
     }
 
@@ -1045,24 +1190,37 @@
       }
     }
 
+    function startThoughts() {
+      const col = document.getElementById('thoughtsCol');
+      if (!col) return;
+      col.innerHTML = '';
+      const shuffled = THOUGHTS.slice().sort(() => Math.random() - 0.5);
+      shuffled.forEach((t, i) => {
+        const b = document.createElement('div');
+        b.className = 'thought-bubble';
+        b.textContent = t;
+        const duration = 14 + (i % 7) * 1.8;
+        const delay = i * 1.1;
+        b.style.animationDuration = duration + 's';
+        b.style.animationDelay = delay + 's';
+        b.style.left = (6 + (i % 3) * 4) + 'px';
+        b.style.right = (6 + ((i + 1) % 3) * 4) + 'px';
+        col.appendChild(b);
+      });
+    }
+
     function openLetter() {
-      document.getElementById('letterQ1').value = letterData.q1 || '';
-      document.getElementById('letterQ2').value = letterData.q2 || '';
-      document.getElementById('letterQ3').value = letterData.q3 || '';
-      document.getElementById('letterQ4').value = letterData.q4 || '';
+      document.getElementById('letterBody').value = letterData.body || '';
       const d = letterData.updatedAt || letterData.createdAt;
       document.getElementById('letterDate').textContent = d
         ? ('Дата: ' + formatDate(d) + (letterData.saved ? '' : ' (черновик)'))
         : ('Дата: ' + formatDate(Date.now()) + ' (новое письмо)');
+      startThoughts();
       open('letterOverlay');
     }
 
     async function downloadLetterPdf() {
-      // ensure current fields are in letterData for PDF content
-      letterData.q1 = document.getElementById('letterQ1').value;
-      letterData.q2 = document.getElementById('letterQ2').value;
-      letterData.q3 = document.getElementById('letterQ3').value;
-      letterData.q4 = document.getElementById('letterQ4').value;
+      letterData.body = document.getElementById('letterBody').value;
       if (!window.html2canvas || !window.jspdf) {
         alert('PDF-библиотека не загрузилась. Проверь интернет и обнови страницу.');
         return;
@@ -1082,11 +1240,9 @@
         const margin = 12;
         const w = pageW - margin * 2;
         const h = canvas.height * w / canvas.width;
-        let y = margin;
         if (h <= pageH - margin * 2) {
-          pdf.addImage(img, 'PNG', margin, y, w, h);
+          pdf.addImage(img, 'PNG', margin, margin, w, h);
         } else {
-          // multi-page crop
           let remaining = h;
           let srcY = 0;
           const pageImgH = pageH - margin * 2;

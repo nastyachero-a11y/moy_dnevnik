@@ -229,6 +229,11 @@
     }
     .save-status.show { opacity: 1; }
 
+    #letterOverlay {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+    }
     .overlay {
       position: fixed; inset: 0; z-index: 50;
       background: rgba(8,16,30,0.55); backdrop-filter: blur(5px);
@@ -340,13 +345,14 @@
     }
     .envelope-meta .saved { color: var(--lime); }
 
+
     .letter-overlay-inner {
       position: relative;
-      width: min(920px, 100%);
+      z-index: 2;
+      width: min(560px, 100%);
       max-height: 92vh;
-      display: grid;
-      grid-template-columns: 1fr 200px;
-      gap: 12px;
+      display: flex;
+      justify-content: center;
       align-items: stretch;
     }
     .letter-sheet {
@@ -417,34 +423,61 @@
       color: #7a5a40;
     }
 
-    .thoughts-col {
-      position: relative;
+    /* Desktop: thoughts float across whole overlay */
+    .thoughts-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
       overflow: hidden;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.18);
-      min-height: 320px;
     }
     .thought-bubble {
       position: absolute;
-      left: 8px;
-      right: 8px;
+      max-width: 220px;
       padding: 10px 12px;
-      background: rgba(255,255,255,0.95);
+      background: rgba(255,255,255,0.92);
       color: #1a1a2e;
       border-radius: 14px;
       font-size: 0.72rem;
       font-weight: 600;
       line-height: 1.35;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-      animation: thoughtFloat linear infinite;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.14);
       opacity: 0;
+      will-change: transform, opacity;
     }
-    @keyframes thoughtFloat {
-      0%   { transform: translateY(110%); opacity: 0; }
-      8%   { opacity: 1; }
-      85%  { opacity: 1; }
-      100% { transform: translateY(-130%); opacity: 0; }
+    .thought-bubble.from-diary {
+      border-left: 3px solid #1e4fd6;
+    }
+    .thought-bubble.from-prompt {
+      border-left: 3px solid #2bb673;
+    }
+    .thought-bubble.from-warm {
+      border-left: 3px solid #e8a54b;
+    }
+
+    @keyframes driftUp {
+      0%   { transform: translateY(20px); opacity: 0; }
+      10%  { opacity: 0.95; }
+      80%  { opacity: 0.95; }
+      100% { transform: translateY(-110vh); opacity: 0; }
+    }
+    @keyframes driftDown {
+      0%   { transform: translateY(-20px); opacity: 0; }
+      10%  { opacity: 0.95; }
+      80%  { opacity: 0.95; }
+      100% { transform: translateY(110vh); opacity: 0; }
+    }
+    @keyframes driftLeft {
+      0%   { transform: translateX(20px); opacity: 0; }
+      10%  { opacity: 0.95; }
+      80%  { opacity: 0.95; }
+      100% { transform: translateX(-40vw); opacity: 0; }
+    }
+    @keyframes driftRight {
+      0%   { transform: translateX(-20px); opacity: 0; }
+      10%  { opacity: 0.95; }
+      80%  { opacity: 0.95; }
+      100% { transform: translateX(40vw); opacity: 0; }
     }
 
     @media (max-width: 700px) {
@@ -452,15 +485,23 @@
       .envelope-wrap { width: 72px; height: 64px; }
       .envelope-caption { font-size: 0.64rem; }
       .letter-overlay-inner {
-        grid-template-columns: 1fr;
-        max-height: 92vh;
-        overflow-y: auto;
+        width: min(560px, 100%);
+        max-height: 70vh;
+        margin-top: 12vh;
+        margin-bottom: 12vh;
       }
-      .thoughts-col {
-        min-height: 140px;
-        max-height: 160px;
+      .letter-sheet { max-height: 70vh; }
+      /* Mobile: only top and bottom bands */
+      .thoughts-layer {
+        /* full overlay still, but bubbles placed only top/bottom via JS */
+      }
+      .thought-bubble {
+        max-width: 46vw;
+        font-size: 0.68rem;
+        padding: 8px 10px;
       }
     }
+
 
 
 
@@ -632,6 +673,7 @@
   </div>
 
   <div class="overlay" id="letterOverlay">
+    <div class="thoughts-layer" id="thoughtsCol" aria-hidden="true"></div>
     <div class="letter-overlay-inner">
       <div class="letter-sheet" id="letterSheet">
         <h2>Письмо себе в будущее</h2>
@@ -643,7 +685,6 @@
           <button type="button" class="btn btn-ghost" data-close="letterOverlay">Закрыть</button>
         </div>
       </div>
-      <div class="thoughts-col" id="thoughtsCol" aria-hidden="true"></div>
     </div>
   </div>
 
@@ -1111,36 +1152,39 @@
     };
 
     const THOUGHTS = [
-      'Чему я хочу научиться в этом году?',
-      'С кем я хочу быть рядом?',
-      'Какой вклад хочу внести?',
-      'Как я хочу себя чувствовать через год?',
-      'Что для меня сейчас по-настоящему моё?',
-      'От чего я готов(а) отказаться?',
-      'Что я переформулирую под себя?',
-      'Где мне нужно просто принять?',
-      'Какая граница для меня важнее всего?',
-      'Кто в моём ресурсном круге уже рядом?',
-      'О чём я молчу, но хочу сказать себе?',
-      'За что я могу себя похвалить уже сейчас?',
-      'Что я разрешаю себе делать без вины?',
-      'Что я разрешаю себе чувствовать?',
-      'За что я себя прощаю?',
-      'Какой маленький шаг сделаю на этой неделе?',
-      'Где я обычно выгораю — и что с этим сделать?',
-      'Что для меня отдых по-настоящему?',
-      'Какую сферу жизни я долго откладывал(а)?',
-      'Какая цель греет, а какая только «надо»?',
-      'Что я хочу оставить в прошлом году?',
-      'Что я хочу взять с собой дальше?',
-      'Кому я благодарен(на) прямо сейчас?',
-      'Какой страх я готов(а) назвать вслух?',
-      'Где мне нужна поддержка, а не героизм?',
-      'Что будет достаточно — без идеала?',
-      'Каким человеком я хочу стать мягче?',
-      'О чём я хочу вспомнить через год с теплом?',
-      'Что я обещаю себе не бросать?',
-      'Если никто не увидит — чего я всё равно хочу?'
+      // Из дневника
+      { text: 'Что из зоны «могу принять» ты отпускаешь?', type: 'diary' },
+      { text: 'Какую границу ты больше не дашь нарушить?', type: 'diary' },
+      { text: 'Кому ты хочешь сказать «спасибо» через год?', type: 'diary' },
+      { text: 'Что из «чужого» ты перестала тащить?', type: 'diary' },
+      { text: 'Какой табурет оказался твоим?', type: 'diary' },
+      { text: 'Что ты разрешаешь себе чувствовать без вины?', type: 'diary' },
+      { text: 'За что ты себя прощаешь уже сейчас?', type: 'diary' },
+      { text: 'Кто был рядом, когда было трудно?', type: 'diary' },
+      { text: 'Что ты заберёшь с собой из этого года?', type: 'diary' },
+      { text: 'От чего ты отказываешься ради себя?', type: 'diary' },
+      // Подсказки для письма
+      { text: 'Что ты хочешь сказать себе через год?', type: 'prompt' },
+      { text: 'Каким человеком ты хочешь стать?', type: 'prompt' },
+      { text: 'Что для тебя сейчас самое важное?', type: 'prompt' },
+      { text: 'О чём ты боишься сказать вслух?', type: 'prompt' },
+      { text: 'Что бы ты хотела, чтобы случилось?', type: 'prompt' },
+      { text: 'Чего ты больше не хочешь терпеть?', type: 'prompt' },
+      { text: 'Какой маленький шаг ты сделаешь завтра?', type: 'prompt' },
+      { text: 'Что приносило тебе радость на этой неделе?', type: 'prompt' },
+      { text: 'За что ты благодарна себе сегодняшней?', type: 'prompt' },
+      { text: 'Что ты хочешь помнить через год?', type: 'prompt' },
+      // Тёплые
+      { text: 'Ты справляешься, даже когда кажется, что нет.', type: 'warm' },
+      { text: 'Ты имеешь право на отдых.', type: 'warm' },
+      { text: 'Ты не обязана быть идеальной.', type: 'warm' },
+      { text: 'Ты уже прошла большой путь.', type: 'warm' },
+      { text: 'Твои чувства — это не слабость.', type: 'warm' },
+      { text: 'Ты можешь сказать «нет» без вины.', type: 'warm' },
+      { text: 'Ты не одна, даже если грустно.', type: 'warm' },
+      { text: 'Твоя ценность не зависит от чужого мнения.', type: 'warm' },
+      { text: 'Ты можешь выбирать себя.', type: 'warm' },
+      { text: 'Всё, что ты чувствуешь, — нормально.', type: 'warm' }
     ];
 
     function formatDate(ts) {
@@ -1194,17 +1238,50 @@
       const col = document.getElementById('thoughtsCol');
       if (!col) return;
       col.innerHTML = '';
+      const isMobile = window.matchMedia('(max-width: 700px)').matches;
       const shuffled = THOUGHTS.slice().sort(() => Math.random() - 0.5);
-      shuffled.forEach((t, i) => {
+      const animsDesktop = ['driftUp', 'driftDown', 'driftLeft', 'driftRight'];
+
+      shuffled.forEach((item, i) => {
         const b = document.createElement('div');
-        b.className = 'thought-bubble';
+        const t = typeof item === 'string' ? item : item.text;
+        const type = typeof item === 'string' ? 'prompt' : item.type;
+        b.className = 'thought-bubble from-' + type;
         b.textContent = t;
-        const duration = 14 + (i % 7) * 1.8;
-        const delay = i * 1.1;
+
+        const duration = 16 + (i % 8) * 2.2;
+        const delay = (i % 12) * 1.35 + Math.random() * 0.8;
         b.style.animationDuration = duration + 's';
         b.style.animationDelay = delay + 's';
-        b.style.left = (6 + (i % 3) * 4) + 'px';
-        b.style.right = (6 + ((i + 1) % 3) * 4) + 'px';
+        b.style.animationTimingFunction = 'linear';
+        b.style.animationIterationCount = 'infinite';
+        b.style.animationFillMode = 'both';
+
+        if (isMobile) {
+          // only top or bottom band
+          const topBand = i % 2 === 0;
+          b.style.left = (4 + (i % 5) * 10) + '%';
+          b.style.top = topBand ? (2 + (i % 3) * 4) + '%' : 'auto';
+          b.style.bottom = topBand ? 'auto' : (2 + (i % 3) * 4) + '%';
+          b.style.animationName = topBand ? 'driftRight' : 'driftLeft';
+        } else {
+          // full screen drift
+          const side = i % 4;
+          b.style.animationName = animsDesktop[side];
+          if (side === 0) { // up from bottom
+            b.style.left = (3 + (i * 7) % 88) + '%';
+            b.style.bottom = '0';
+          } else if (side === 1) { // down from top
+            b.style.left = (5 + (i * 11) % 85) + '%';
+            b.style.top = '0';
+          } else if (side === 2) { // left from right
+            b.style.right = '0';
+            b.style.top = (8 + (i * 9) % 75) + '%';
+          } else { // right from left
+            b.style.left = '0';
+            b.style.top = (12 + (i * 13) % 70) + '%';
+          }
+        }
         col.appendChild(b);
       });
     }

@@ -444,6 +444,19 @@
       box-shadow: 0 6px 16px rgba(0,0,0,0.14);
       opacity: 0;
       will-change: transform, opacity;
+      pointer-events: auto;
+      cursor: pointer;
+      transition: box-shadow 0.35s ease, background 0.35s ease, border-color 0.35s ease;
+    }
+    .thought-bubble.glow {
+      background: linear-gradient(145deg, #fff8dc, #ffe9a8);
+      border-color: #f0c14a !important;
+      box-shadow:
+        0 0 0 2px rgba(240, 193, 74, 0.55),
+        0 0 18px rgba(255, 200, 60, 0.75),
+        0 0 36px rgba(255, 180, 40, 0.45);
+      opacity: 1 !important;
+      z-index: 5;
     }
     .thought-bubble.from-diary {
       border-left: 3px solid #1e4fd6;
@@ -1152,39 +1165,38 @@
     };
 
     const THOUGHTS = [
-      // Из дневника
-      { text: 'Что из зоны «могу принять» ты отпускаешь?', type: 'diary' },
-      { text: 'Какую границу ты больше не дашь нарушить?', type: 'diary' },
-      { text: 'Кому ты хочешь сказать «спасибо» через год?', type: 'diary' },
-      { text: 'Что из «чужого» ты перестала тащить?', type: 'diary' },
-      { text: 'Какой табурет оказался твоим?', type: 'diary' },
-      { text: 'Что ты разрешаешь себе чувствовать без вины?', type: 'diary' },
-      { text: 'За что ты себя прощаешь уже сейчас?', type: 'diary' },
-      { text: 'Кто был рядом, когда было трудно?', type: 'diary' },
-      { text: 'Что ты заберёшь с собой из этого года?', type: 'diary' },
-      { text: 'От чего ты отказываешься ради себя?', type: 'diary' },
-      // Подсказки для письма
+      // Вопросы для размышления
       { text: 'Что ты хочешь сказать себе через год?', type: 'prompt' },
       { text: 'Каким человеком ты хочешь стать?', type: 'prompt' },
       { text: 'Что для тебя сейчас самое важное?', type: 'prompt' },
       { text: 'О чём ты боишься сказать вслух?', type: 'prompt' },
-      { text: 'Что бы ты хотела, чтобы случилось?', type: 'prompt' },
+      { text: 'Что бы ты хотел(а), чтобы случилось?', type: 'prompt' },
       { text: 'Чего ты больше не хочешь терпеть?', type: 'prompt' },
-      { text: 'Какой маленький шаг ты сделаешь завтра?', type: 'prompt' },
+      { text: 'Какой шаг ты сделаешь завтра?', type: 'prompt' },
       { text: 'Что приносило тебе радость на этой неделе?', type: 'prompt' },
-      { text: 'За что ты благодарна себе сегодняшней?', type: 'prompt' },
+      { text: 'За что ты благодарен(на) себе сегодня?', type: 'prompt' },
       { text: 'Что ты хочешь помнить через год?', type: 'prompt' },
-      // Тёплые
+      { text: 'От чего ты готов(а) отказаться ради себя?', type: 'prompt' },
+      { text: 'Какую границу ты больше не дашь нарушить?', type: 'prompt' },
+      { text: 'Что ты разрешаешь себе чувствовать без вины?', type: 'prompt' },
+      { text: 'Кто был рядом, когда было трудно?', type: 'prompt' },
+      { text: 'Что ты отпускаешь?', type: 'prompt' },
+      // Поддерживающие
       { text: 'Ты справляешься, даже когда кажется, что нет.', type: 'warm' },
       { text: 'Ты имеешь право на отдых.', type: 'warm' },
-      { text: 'Ты не обязана быть идеальной.', type: 'warm' },
-      { text: 'Ты уже прошла большой путь.', type: 'warm' },
+      { text: 'Ты не обязан(а) быть идеальным(ой).', type: 'warm' },
+      { text: 'Ты уже прошёл(ла) большой путь.', type: 'warm' },
       { text: 'Твои чувства — это не слабость.', type: 'warm' },
       { text: 'Ты можешь сказать «нет» без вины.', type: 'warm' },
-      { text: 'Ты не одна, даже если грустно.', type: 'warm' },
+      { text: 'Ты не один(а), даже если грустно.', type: 'warm' },
       { text: 'Твоя ценность не зависит от чужого мнения.', type: 'warm' },
       { text: 'Ты можешь выбирать себя.', type: 'warm' },
-      { text: 'Всё, что ты чувствуешь, — нормально.', type: 'warm' }
+      { text: 'Всё, что ты чувствуешь, — нормально.', type: 'warm' },
+      { text: 'Маленькие шаги — это тоже путь.', type: 'warm' },
+      { text: 'Ты не обязан(а) всё контролировать.', type: 'warm' },
+      { text: 'Ошибаться — это часть роста.', type: 'warm' },
+      { text: 'Удобный(ая) — не значит счастливый(ая).', type: 'warm' },
+      { text: 'Ты уже достаточно хорош(а).', type: 'warm' }
     ];
 
     function formatDate(ts) {
@@ -1249,8 +1261,8 @@
         b.className = 'thought-bubble from-' + type;
         b.textContent = t;
 
-        const duration = 16 + (i % 8) * 2.2;
-        const delay = (i % 12) * 1.35 + Math.random() * 0.8;
+        const duration = 32 + (i % 8) * 4.4; // ~2x slower
+        const delay = (i % 12) * 2.7 + Math.random() * 1.6;
         b.style.animationDuration = duration + 's';
         b.style.animationDelay = delay + 's';
         b.style.animationTimingFunction = 'linear';
@@ -1282,6 +1294,10 @@
             b.style.top = (12 + (i * 13) % 70) + '%';
           }
         }
+        b.addEventListener('click', (e) => {
+          e.stopPropagation();
+          b.classList.toggle('glow');
+        });
         col.appendChild(b);
       });
     }
